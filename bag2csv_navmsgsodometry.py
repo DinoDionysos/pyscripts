@@ -4,9 +4,12 @@ import numpy as np
 import sys
 import os
 
+# get the name of the file that we are executing
+file_name = os.path.basename(__file__)
+
 # check if the user has provided the correct number of arguments
 if len(sys.argv) != 4:
-    print("Usage: python3 bag2csv_navmsgsodometry.py <bag_name> <topic_name> <csv_name>")
+    print("Usage: python3 "+file_name+" <bag_name> <topic_name> <csv_name> \nThe files <bag_name> and <csv_name> should be placed in the bags and csv folders respectively. \nDo not add bag/ or csv/ in front of the file names.")
     sys.exit(1)
 
 # read the first input from command line
