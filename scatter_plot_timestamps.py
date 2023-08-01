@@ -4,19 +4,24 @@
 import pandas as pd
 import matplotlib.pyplot as plt 
 import numpy as np
-# plt.style.use('dark_background')
-# plt.rcParams.update({
-#     "axes.facecolor": (0.5,0.5,0.5),
-#     "figure.facecolor": (0.1,0.1,0.1),
-#     "grid.color": (0.3,0.3,0.3)}),
+import sys
+
+plt.style.use('dark_background')
+plt.rcParams.update({
+    "axes.facecolor": (0.5,0.5,0.5),
+    "figure.facecolor": (0.1,0.1,0.1),
+    "grid.color": (0.3,0.3,0.3)}),
+
+ground_truth_path = sys.argv[1]
+camera_pose_path = sys.argv[2]
 
 # read the csv file
-df = pd.read_csv('csv/test_orbmono_vs_gt-bag-ground_truth-odom.csv')
+df_gt = pd.read_csv(ground_truth_path)
 # and the other csv file orbmono
-df2 = pd.read_csv('csv/test_orbmono_vs_gt-bag--orb_slam3-camera_pose.csv')
+df2 = pd.read_csv(camera_pose_path)
 
 # get the timestamp column
-df_timestamp = df['stamp']
+df_timestamp = df_gt['stamp']
 # get the timestamp column
 df2_timestamp = df2['stamp']
 # normalize the timestamp column
@@ -45,9 +50,9 @@ ax[0].axes.get_yaxis().set_visible(False)
 
 
 # get column x as a numpy array
-df_x = df['x'].to_numpy()
+df_x = df_gt['x'].to_numpy()
 # get column y as a numpy array
-df_y = df['y'].to_numpy()
+df_y = df_gt['y'].to_numpy()
 # get column x as a numpy array
 df2_x = df2['x'].to_numpy()
 # get column y as a numpy array
@@ -65,8 +70,8 @@ max2_y = max(df2_y)
 ratio_x = max_x / max2_x
 ratio_y = max_y / max2_y
 # scale dataset 2 times the ratio
-df2_x = df2_x * ratio_x
-df2_y = df2_y * ratio_y
+#df2_x = df2_x * ratio_x
+#df2_y = df2_y * ratio_y
 
 ax[1].set_title('Trajectory')
 ax[1].plot(df_x, df_y, color='blue', marker='o', linestyle='none')
