@@ -21,17 +21,11 @@ df_gt_timestamp = df_gt_timestamp.to_numpy()
 # save the x and y column of the ground truth to numpy array
 gt_x = df_gt['x'].to_numpy()
 gt_y = df_gt['y'].to_numpy()
-# print length of gt_x and gt_y
-print(len(gt_x))
-print(len(gt_y))
 # interpolate the data_x and data_y to the length of gt_x and gt_y
 gt_x = np.interp(df_data_timestamp, df_gt_timestamp, gt_x)
 gt_y = np.interp(df_data_timestamp, df_gt_timestamp, gt_y)
 # combine with a zero array as the z column
 gt_z = np.zeros(len(gt_x))
-# print length of gt_x and gt_y
-print(len(gt_x))
-print(len(gt_y))
 # combine into one numpy array
 true_points = np.array([gt_x, gt_y, gt_z])
 
@@ -43,20 +37,9 @@ data_z = np.zeros(len(data_x))
 # combine into one numpy array
 mapping_points = np.array([data_x, data_y, data_z])
 
-
-
-
-
-
-# print both dimensions lengths of both arrays
-print(true_points.shape)
-print(mapping_points.shape)
 #transpose
 true_points = true_points.T
 mapping_points = mapping_points.T
-print(true_points)
-print(mapping_points)
-
 
 
 # kapsch algorithm from https://stackoverflow.com/questions/60877274/optimal-rotation-in-3d-with-kabsch-algorithm
