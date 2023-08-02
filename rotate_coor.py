@@ -59,16 +59,7 @@ print(mapping_points)
 
 
 
-# do kapsch algorithm on gt and data
-# https://en.wikipedia.org/wiki/Kabsch_algorithm
-#
-# 1. Compute the centroids of both point clouds.
-# 2. Compute the covariance matrix H.
-# 3. Compute the Singular Value Decomposition of H.
-# 4. Compute the rotation matrix R.
-# 5. Compute the translation vector t.
-# 6. Transform the point cloud.
-# 7. Compute the RMSD between the two point clouds.
+# kapsch algorithm from https://stackoverflow.com/questions/60877274/optimal-rotation-in-3d-with-kabsch-algorithm
 
 mapped_centroid = np.average(mapping_points, axis=0)
 true_centroid = np.average(true_points, axis=0)
@@ -103,8 +94,8 @@ mapped_xyz -= mapped_xyz[0]
 import matplotlib.pyplot as plt
 # make the scale of x and y equal
 plt.axis('equal')
-plt.plot(mapped_xyz[:,0], mapped_xyz[:,1], label='mapped')
 plt.plot(true_points[:,0], true_points[:,1], label='true')
+plt.plot(mapped_xyz[:,0], mapped_xyz[:,1], label='mapped')
 plt.legend()
 plt.show()
 
