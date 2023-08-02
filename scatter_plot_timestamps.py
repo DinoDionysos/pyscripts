@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 import numpy as np
 import sys
+import os
 
 plt.style.use('dark_background')
 plt.rcParams.update({
@@ -12,79 +13,106 @@ plt.rcParams.update({
     "figure.facecolor": (0.1,0.1,0.1),
     "grid.color": (0.3,0.3,0.3)}),
 
-ground_truth_path = sys.argv[1]
-camera_pose_path = sys.argv[2]
+file_name = os.path.basename(__file__)
 
-# read the csv file
-df_gt = pd.read_csv(ground_truth_path)
-# and the other csv file orbmono
-df2 = pd.read_csv(camera_pose_path)
+csv_path_list = []
+csv_type_list = []
+csv_type_name_list = ['ground_truth', 'mono', 'stereo', 'd435']
+# read a dynamic number of input arguments
+for i in range(1, len(sys.argv)):
+    # if the the argument starts with csv/, then remove it
+    if sys.argv[i].startswith('csv/'):
+        sys.argv[i] = sys.argv[i].replace('csv/', '')
+    # check all the files in csv/ directory if they contain the sys.argv[i] in their name
+    # if they do, add them to the csv_path_list
+    for file in os.listdir('csv/'):
+        if sys.argv[i] in file:
+            # if the file is already in the list, do not add it again
+            if file in csv_path_list:
+                continue
+            else:
+                csv_path_list.append('csv/'+file)
+                #check if the file has ground_truth, mono, stereo or d435 in it and assign a number to csv_type_list accordingly
+                if 'ground_truth' in file:  
+                    csv_type_list.append(0)
+                elif 'mono' in file:
+                    csv_type_list.append(1)
+                elif 'stereo' in file:
+                    csv_type_list.append(2)
+                elif 'd435' in file:
+                    csv_type_list.append(3)
+                else:
+                    print("[INFO] "+file_name+" | The file: " + file + " does not contain ground_truth, mono, stereo or d435 in it. Please rename the file accordingly.")
+                    sys.exit(1)
 
-# get the timestamp column
-df_timestamp = df_gt['stamp']
-# get the timestamp column
-df2_timestamp = df2['stamp']
-# normalize the timestamp column
-df_timestamp = df_timestamp - df_timestamp[0]
-# normalize the timestamp column
-df2_timestamp = df2_timestamp - df2_timestamp[0]
-#convert to numpy array
-df_timestamp = df_timestamp.to_numpy()
-#convert to numpy array
-df2_timestamp = df2_timestamp.to_numpy()
-# make arry of ones
-ones = np.ones(len(df_timestamp))
-# make arry of ones
-ones2 = np.ones(len(df2_timestamp))
+df_list = []
+for i in range(len(csv_path_list)):
+    df_list.append(pd.read_csv(csv_path_list[i]))
 
-fig, ax = plt.subplots(2,1)
+# first plot
+
+fig, ax = plt.subplots(2, 1, gridspec_kw={'height_ratios': [1, 7]})
 fig.tight_layout(h_pad=2)
-
 ax[0].set_title('Timestamps')
-df_handle = ax[0].plot(df_timestamp, ones, color='blue', marker='o', linestyle='none')
-df2_handle = ax[0].plot(df2_timestamp, ones2, color='red', marker='o', linestyle='none') 
-ax[0].legend(['Ground Truth', 'ORB SLAM3'])
 ax[0].set_xlabel('time')
-# hide the y axis
 ax[0].axes.get_yaxis().set_visible(False)
+legend_list = []
+color_list = ['blue', 'red', 'green', 'orange', 'purple', 'pink', 'cyan', 'yellow']
 
+# for all the csv files in the list
+for i in range(len(df_list)):
+    # get the timestamp column
+    df_timestamp = df_list[i]['stamp']
+    # normalize the timestamp column
+    df_timestamp = df_timestamp - df_timestamp[0]
+    #convert to numpy array
+    df_timestamp = df_timestamp.to_numpy()
+    # make arry of ones
+    ones = np.ones(len(df_timestamp))
+    # plot the timestamp
+    ax[0].plot(df_timestamp, ones, color=color_list[i], marker='o', linestyle='none')
+    legend_list.append(csv_type_name_list[csv_type_list[i]])
 
-# get column x as a numpy array
-df_x = df_gt['x'].to_numpy()
-# get column y as a numpy array
-df_y = df_gt['y'].to_numpy()
-# get column x as a numpy array
-df2_x = df2['x'].to_numpy()
-# get column y as a numpy array
-df2_y = df2['y'].to_numpy()
-# normalize the x and y columns
-df_x = df_x - df_x[0]
-df_y = df_y - df_y[0]
-# get max value of x and y
-max_x = max(df_x)
-max_y = max(df_y)
-# get max value of x and y
-max2_x = max(df2_x)
-max2_y = max(df2_y)
-# calculate the ratio between the two max values
-ratio_x = max_x / max2_x
-ratio_y = max_y / max2_y
-# scale dataset 2 times the ratio
-#df2_x = df2_x * ratio_x
-#df2_y = df2_y * ratio_y
+ax[0].legend(legend_list)
 
+# second plot
 ax[1].set_title('Trajectory')
-ax[1].plot(df_x, df_y, color='blue', marker='o', linestyle='none')
-ax[1].plot(df2_x, df2_y, color='red', marker='o', linestyle='none')
-ax[1].legend(['Ground Truth', 'ORB SLAM3'], loc='lower left')
 ax[1].set_xlabel('x')
 ax[1].set_ylabel('y')
 
 fig.suptitle('ORB SLAM3 vs Ground Truth')
-plt.subplots_adjust(top=0.85)
-plt.subplots_adjust(hspace=0.6)
+plt.subplots_adjust(top=0.92)
+# plt.subplots_adjust(hspace=0.6)
 
+df_x_list = []
+df_y_list = []
+for i in range(len(df_list)):
+    df_x_list.append(df_list[i]['x'].to_numpy())
+    # df_y_list.append(df_list[i]['y'].to_numpy()) but for d435 we need to use z instead of y
+    if csv_type_list[i] == 3:
+        df_y_list.append(df_list[i]['z'].to_numpy())
+    else:
+        df_y_list.append(df_list[i]['y'].to_numpy())
+    # normalize the x and y columns
+    df_x_list[i] = df_x_list[i] - df_x_list[i][0]
+    df_y_list[i] = df_y_list[i] - df_y_list[i][0]
+    # do the scaling only for mono
+    if csv_type_list[i] == 1:
+        # get max value of x and y
+        max_x = max(df_x_list[i])
+        max_y = max(df_y_list[i])
+        # scale dataset times the ratio
+        df_x_list[i] = df_x_list[i] / max_x
+        df_y_list[i] = df_y_list[i] / max_y
+    # set x lim to [-8,32]
+    ax[1].set_xlim([-8,32])
+    ax[1].plot(df_x_list[i], df_y_list[i], color=color_list[i], marker='o', markeredgecolor='black') 
 
+# plot a green x at 0,0
+ax[1].plot(0, 0, color='green', marker='x', linestyle='none')
+ax[1].legend(legend_list, loc='lower left')
+
+    
 
 
 plt.show()
