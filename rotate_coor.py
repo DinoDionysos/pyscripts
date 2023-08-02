@@ -77,8 +77,8 @@ mapped_xyz -= mapped_xyz[0]
 import matplotlib.pyplot as plt
 # make the scale of x and y equal
 plt.axis('equal')
-plt.plot(true_points[:,0], true_points[:,1], label='true')
-plt.plot(mapped_xyz[:,0], mapped_xyz[:,1], label='mapped')
+plt.plot(true_points[:,0], true_points[:,1], marker='o', markeredgecolor='black', label='true')
+plt.plot(mapped_xyz[:,0], mapped_xyz[:,1], marker='o', markeredgecolor='black', label='mapped')
 plt.legend()
 plt.show()
 
