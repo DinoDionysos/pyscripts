@@ -9,11 +9,14 @@ file_name = os.path.basename(__file__)
 print(len(sys.argv))
 # check if the user has provided the correct number of arguments
 if len(sys.argv) > 4 or len(sys.argv) < 3:
-    print("[INFO] "+file_name+" | Usage: python3 "+file_name+" <bag_name> <topic_name> optional:<topic_type> \nThe file <bag_name> should be placed in the bags folder respectively. \nIt is not necessary to have 'bag/' in the beginning of the <bag_name>.\n <topic_type> is optional and can be found by executing: 'rosbag info <bag_name> -y -k topics'\n <topic_name> has a '/' in the beginning.")
+    print("[INFO] "+file_name+" | Usage: python3 "+file_name+" <bag_name> <topic_name> optional:<topic_type> \nThe file <bag_name> should be placed in the bags folder respectively. \nIt is not necessary to have 'bags/' in the beginning of the <bag_name>.\n <topic_type> is optional and can be found by executing: 'rosbag info <bag_name> -y -k topics'\n <topic_name> has a '/' in the beginning.")
     sys.exit(1)
 
 # read the first input from command line
 bag_name = sys.argv[1]
+# if bag_name starts with bags/, remove it
+if bag_name.startswith('bags/'):
+    bag_name = bag_name.replace('bags/', '')
 topic_name = sys.argv[2]
 
 if len(sys.argv) == 4:
