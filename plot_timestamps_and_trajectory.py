@@ -82,6 +82,7 @@ ax[1].set_ylabel('y')
 
 fig.suptitle('ORB SLAM3 vs Ground Truth')
 plt.subplots_adjust(top=0.92)
+plt.axis('equal')
 # plt.subplots_adjust(hspace=0.6)
 
 df_x_list = []
@@ -114,5 +115,5 @@ ax[1].legend(legend_list, loc='lower left')
 
     
 
-
+fig.tight_layout(h_pad=2)
 plt.show()
