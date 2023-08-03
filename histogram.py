@@ -36,6 +36,7 @@ ax[1].set_ylabel('frequency', fontsize=fontsize_ylabel)
 ax[0].tick_params(axis='both', which='major', labelsize=labelsize_axes)
 ax[1].tick_params(axis='both', which='major', labelsize=labelsize_axes)
 
+
 fig.tight_layout(h_pad=2)
 # plt.show()
 
@@ -47,12 +48,12 @@ fig, ax = plt.subplots(2, 1)
 fig.suptitle(suptitle)
 ax[0].yaxis.grid(color='gray', linestyle='dashed')
 ax[0].hist(df['x_diff'], bins=100)
-ax[0].set_title('Signed distance to ground truth in x')
+ax[0].set_title('Signed distance to ground truth in x dimension')
 ax[0].set_xlabel('distance in x', fontsize=fontsize_xlabel)
 ax[0].set_ylabel('frequency', fontsize=fontsize_ylabel)
 ax[1].yaxis.grid(color='gray', linestyle='dashed')
 ax[1].hist(df['y_diff'], bins=100)
-ax[1].set_title('Signed distance to ground truth in y')
+ax[1].set_title('Signed distance to ground truth in y dimension')
 ax[1].set_xlabel('distance in y', fontsize=fontsize_xlabel)
 ax[1].set_ylabel('frequency', fontsize=fontsize_ylabel)
 ax[0].tick_params(axis='both', which='major', labelsize=labelsize_axes)
@@ -61,21 +62,34 @@ fig.tight_layout(h_pad=2)
 # plt.show()
 
 # plot the diffs against the time stamp
-fig, ax = plt.subplots(2, 1)
+fig, ax = plt.subplots(3, 1)
 fig.suptitle(suptitle)
 ax[0].yaxis.grid(color='gray', linestyle='dashed')
 ax[0].plot(df['stamp'], df['x_diff'])
-ax[0].set_title('Signed distance to ground truth in x')
+ax[0].set_title('Signed distance to ground truth in x dimension')
 ax[0].set_xlabel('time', fontsize=fontsize_xlabel)
 ax[0].set_ylabel('distance in x', fontsize=fontsize_ylabel)
 ax[1].yaxis.grid(color='gray', linestyle='dashed')
 ax[1].plot(df['stamp'], df['y_diff'])
-ax[1].set_title('Signed distance to ground truth in y')
+ax[1].set_title('Signed distance to ground truth in y dimension')
 ax[1].set_xlabel('time', fontsize=fontsize_xlabel)
 ax[1].set_ylabel('distance in y', fontsize=fontsize_ylabel)
 ax[0].tick_params(axis='both', which='major', labelsize=labelsize_axes)
 ax[1].tick_params(axis='both', which='major', labelsize=labelsize_axes)
-fig.tight_layout(h_pad=2)
+ax[2].yaxis.grid(color='gray', linestyle='dashed')
+ax[2].plot(df['stamp'], df['euclidean_distance'])
+ax[2].set_title('Euclidean distance to ground truth')
+ax[2].set_xlabel('time', fontsize=fontsize_xlabel)
+ax[2].set_ylabel('euclidean distance', fontsize=fontsize_ylabel)
+ax[2].tick_params(axis='both', which='major', labelsize=labelsize_axes)
+# make the figure larger in height
+fig.set_figheight(8)
+
+
+fig.tight_layout(h_pad=1)
+
+
+
 
 plt.show()
 
