@@ -37,7 +37,12 @@ true_points = np.array([gt_x, gt_y, gt_z])
 
 # save the x and y column of the data to numpy array
 data_x = df_data['x'].to_numpy()
-data_y = df_data['y'].to_numpy()
+# if sys.arg[2] contains orb and d435 and not imu then get the z axis instead of the y axis
+if 'orb' in sys.argv[2] and 'd435' in sys.argv[2] and 'imu' not in sys.argv[2]:
+    data_y = df_data['z'].to_numpy()
+else:
+    data_y = df_data['y'].to_numpy()
+
 # zero arry as z column
 data_z = np.zeros(len(data_x))
 # combine into one numpy array
@@ -80,14 +85,6 @@ true_points -= true_points[0]
 mapping_points -= mapping_points[0]
 mapped_xyz -= mapped_xyz[0]
 
-# plot the x y of mapped_xyz and true_points
-# make the scale of x and y equal
-plt.axis('equal')
-plt.plot(true_points[:,0], true_points[:,1], marker='o', markeredgecolor='black', label='true')
-plt.plot(mapped_xyz[:,0], mapped_xyz[:,1], marker='o', markeredgecolor='black', label='mapped')
-plt.legend()
-# plt.show()
-
 # make a dataframe from the mapped_xyz, true_points and timestamps
 df_data = pd.DataFrame({'stamp': df_data_timestamp, 'x_data': mapped_xyz[:,0], 'y_data': mapped_xyz[:,1], 'x_gt': true_points[:,0], 'y_gt': true_points[:,1]})
 
@@ -101,11 +98,19 @@ csv_file += '_vs_' + sys.argv[2].split('/')[1].split('--')[0] + '.csv'
 print(csv_file)
 df_data.to_csv(csv_file, index=False)
 
-# # plot x_data against x_gt
-# plt.plot(df_data['x_data'], df_data['x_gt'], label='x')
-# # plt.plot(df_data['y_data'], df_data['y_gt'], label='y')
-# plt.legend()
-# plt.show()
+# plot the x y of mapped_xyz and true_points
+# make the scale of x and y equal
+plt.axis('equal')
+# for all points with the same timestamp plot a line between them
+for i in range(len(true_points)):
+    plt.plot([true_points[i,0], mapped_xyz[i,0]], [true_points[i,1], mapped_xyz[i,1]], color='gray')
+plt.plot(true_points[:,0], true_points[:,1], marker='o', markeredgecolor='black', label='true')
+plt.plot(mapped_xyz[:,0], mapped_xyz[:,1], marker='o', markeredgecolor='black', label='mapped')
+
+plt.legend()
+plt.show()
+
+
 
 
 
