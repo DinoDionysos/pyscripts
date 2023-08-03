@@ -105,13 +105,11 @@ for i in range(len(df_list)):
         # scale dataset times the ratio
         df_x_list[i] = df_x_list[i] / max_x
         df_y_list[i] = df_y_list[i] / max_y
-    # set x lim to [-8,32]
-    ax[1].set_xlim([-8,32])
     ax[1].plot(df_x_list[i], df_y_list[i], color=color_list[i], marker='o', markeredgecolor='black') 
 
 # plot a green x at 0,0
 ax[1].plot(0, 0, color='green', marker='x', linestyle='none')
-ax[1].legend(legend_list, loc='lower left')
+ax[1].legend(legend_list)
 
     
 
