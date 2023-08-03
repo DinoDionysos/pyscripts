@@ -86,7 +86,7 @@ mapping_points -= mapping_points[0]
 mapped_xyz -= mapped_xyz[0]
 
 # make a dataframe from the mapped_xyz, true_points and timestamps
-df_data = pd.DataFrame({'stamp': df_data_timestamp, 'x_data': mapped_xyz[:,0], 'y_data': mapped_xyz[:,1], 'x_gt': true_points[:,0], 'y_gt': true_points[:,1]})
+df_data = pd.DataFrame({'stamp': df_data_timestamp, 'x': mapped_xyz[:,0], 'y': mapped_xyz[:,1], 'x_gt': true_points[:,0], 'y_gt': true_points[:,1]})
 
 # split the argument 1 by '/' and get the last part
 csv_file = 'csv/aligned/' + sys.argv[1].split('/')[-1].split('.')[0]

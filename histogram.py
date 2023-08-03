@@ -15,7 +15,7 @@ csv_file = sys.argv[1]
 df = pd.read_csv(csv_file)
 
 # calculate the euclidean distance between the ground truth and the data without z
-df['euclidean_distance'] = ((df['x_data'] - df['x_gt'])**2 + (df['y_data'] - df['y_gt'])**2)**0.5
+df['euclidean_distance'] = ((df['x'] - df['x_gt'])**2 + (df['y'] - df['y_gt'])**2)**0.5
 
 #calculate the delta of the euclidean_distance column
 df['euclidean_distance_delta'] = df['euclidean_distance'].diff()
@@ -41,8 +41,8 @@ fig.tight_layout(h_pad=2)
 # plt.show()
 
 #calculate the difference between the x and y columns of the ground truth and the data
-df['x_diff'] = df['x_data'] - df['x_gt']
-df['y_diff'] = df['y_data'] - df['y_gt']
+df['x_diff'] = df['x'] - df['x_gt']
+df['y_diff'] = df['y'] - df['y_gt']
 #plot histogram of x_diff and y_diff in subplot
 fig, ax = plt.subplots(2, 1)
 fig.suptitle(suptitle)
