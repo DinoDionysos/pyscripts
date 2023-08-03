@@ -1,7 +1,13 @@
 import sys
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
+plt.style.use('dark_background')
+plt.rcParams.update({
+    "axes.facecolor": (0.3,0.3,0.3),
+    "figure.facecolor": (0.1,0.1,0.1),
+    "grid.color": (0.3,0.3,0.3)}),
 
 # load the csv second argument 
 df_gt = pd.read_csv(sys.argv[1])
@@ -73,20 +79,33 @@ mapping_points += mapped_centroid
 true_points -= true_points[0]
 mapping_points -= mapping_points[0]
 mapped_xyz -= mapped_xyz[0]
-#plot the x y of mapped_xyz and true_points
-import matplotlib.pyplot as plt
+
+# plot the x y of mapped_xyz and true_points
 # make the scale of x and y equal
 plt.axis('equal')
 plt.plot(true_points[:,0], true_points[:,1], marker='o', markeredgecolor='black', label='true')
 plt.plot(mapped_xyz[:,0], mapped_xyz[:,1], marker='o', markeredgecolor='black', label='mapped')
 plt.legend()
-plt.show()
+# plt.show()
+
+# make a dataframe from the mapped_xyz, true_points and timestamps
+df_data = pd.DataFrame({'stamp': df_data_timestamp, 'x_data': mapped_xyz[:,0], 'y_data': mapped_xyz[:,1], 'x_gt': true_points[:,0], 'y_gt': true_points[:,1]})
+
+# split the argument 1 by '/' and get the last part
+csv_file = 'csv/aligned/' + sys.argv[1].split('/')[-1].split('.')[0]
+csv_file += '_vs_' + sys.argv[2].split('/')[1].split('--')[0] + '.csv'
+# csv_file += '_vs_' + sys.argv[2].split('/')[1]
+# csv_file += '_vs_' + sys.argv[2].split('/')[1]
+# csv_file += '_vs_' + sys.argv[2].split('/')[1]
+# save the dataframe as csv
+print(csv_file)
+df_data.to_csv(csv_file, index=False)
+
+# # plot x_data against x_gt
+# plt.plot(df_data['x_data'], df_data['x_gt'], label='x')
+# # plt.plot(df_data['y_data'], df_data['y_gt'], label='y')
+# plt.legend()
+# plt.show()
 
 
 
-
-# # save the dataframe to the same csv file
-# df.to_csv(sys.argv[1], index=False)
-
-# save to differnet csv file
-df_data.to_csv('csv/rotated_stereo.csv', index=False)
