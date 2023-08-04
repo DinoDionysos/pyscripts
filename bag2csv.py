@@ -6,7 +6,6 @@ import os
 
 # get the name of the file that we are executing
 file_name = os.path.basename(__file__)
-print(len(sys.argv))
 # check if the user has provided the correct number of arguments
 if len(sys.argv) > 4 or len(sys.argv) < 3:
     print("[INFO] "+file_name+" | Usage: python3 "+file_name+" <bag_name> <topic_name> optional:<topic_type> \nThe file <bag_name> should be placed in the bags folder respectively. \nIt is not necessary to have 'bags/' in the beginning of the <bag_name>.\n <topic_type> is optional and can be found by executing: 'rosbag info <bag_name> -y -k topics'\n <topic_name> has a '/' in the beginning.")
