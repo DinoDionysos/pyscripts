@@ -48,6 +48,8 @@ else:
 
 # make csv_file the combination of first and second
 csv_file = bag_name + '-' + topic_name
+# if there is a / in csv_file, before '.bag', remove everything before the first /
+csv_file = csv_file.split('/',1)[1]
 # replace the / with -
 csv_file = csv_file.replace('/', '-')
 # replace the . with -
