@@ -7,8 +7,8 @@ import os
 folder_1 = "/home/dino/figures"
 folder_2 = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/figures"
 
-save_name = 'c4_orb_s1_gt.pdf'
-save_name_path = '/home/dino/figures/' + save_name; 
+save_name = 'c4_orb_s1_gt'
+save_name += '.pdf'
 title = 'Trajectory: ORB SLAM3 stereo vs. Ground Truth'
 
 # for small figure, f.ex. for subfigures half page
@@ -61,7 +61,7 @@ ax.set_ylabel('y in meters', fontsize=fontsize_ylabel)
 ax.tick_params(axis='both', which='major', labelsize=labelsize_axes)
 
 
-# fig.suptitle('ORB SLAM3 d435 vs Ground Truth')
+# fig.suptitle('ORB SLAM3 d435 vs. Ground Truth')
 plt.subplots_adjust(top=0.92)
 plt.axis('equal')
 # add a grid
@@ -111,10 +111,10 @@ plt.show(block=False)
 # save the plot if prompt is 'y'. if prompt is 'n' do not save the plot. show the save_name in the question
 #check if the save_name_path already exists
 print('------------------------------------------------------------------------------------')
-if os.path.exists(save_name_path):
+if os.path.exists(folder_2 + "/" + save_name):
     prompt = input("The file " + save_name + " already exists. If you want to overwrite it, type 'y' and enter: ")
     if prompt == 'y':
-        fig.savefig(save_name_path)
+        # fig.savefig(folder_1 + "/" + save_name)
         fig.savefig(folder_2 + "/" + save_name)
         print("saved: " + save_name)
     else:
@@ -122,11 +122,12 @@ if os.path.exists(save_name_path):
 else:
     prompt = input("If you want to save the plot to " + save_name + ", type 'y' and enter: ")
     if prompt == 'y':
-        fig.savefig(save_name_path)
+        # fig.savefig(folder_1 + "/" + save_name)
         fig.savefig(folder_2 + "/" + save_name)
         print("saved: " + save_name)
     else:
         print("did not save: " + save_name)
+
 print("Segmentation fault in next line from plt.show() is normal.")
 
 
