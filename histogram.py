@@ -17,10 +17,12 @@ fontsize_ylabel = fontsize_xlabel
 labelsize_axes = 13
 fontsize_title = 16
 fontsize_legend = 12
+fontsize_legend_time = fontsize_legend
 linewidth_gt = 2
 linewidth_data = 2
-suptitle = 'ORB SLAM3 stereo vs rgbd' # overall title on the very top
+suptitle = 'ORB SLAM3 stereo and ORB SLAM3 rgbd' # overall title on the very top
 color_list = ['red', 'black', 'blue', 'green', 'orange', 'purple', 'pink', 'cyan', 'yellow']
+df_type_list_overwrite = ['stereo', 'rgb'] # leaf blank if no overwrite
 
 bins_x_number = 50
 bins_y_number = bins_x_number
@@ -37,7 +39,7 @@ bins_euclidean_delta = np.linspace(-0.1,0.1,bins_euclidean_delta_number)
 plt.rc('axes', axisbelow=True)
 
 df_list = []
-df_type_list = []
+df_type_list = df_type_list_overwrite
 df_type_name_list = ['ground_truth', 'mono', 'stereo', 'd435', 'unknown']
 # import arbitrary number of csv files from csv/aligned
 for i in range(1, len(sys.argv)):
@@ -60,29 +62,29 @@ euclidean_distance_delta_list = []
 for i in range(len(df_list)):
     euclidean_distance_list.append(df_list[i]['euclidean_distance'].to_numpy())
     euclidean_distance_delta_list.append(df_list[i]['euclidean_distance_delta'].to_numpy())
-#plot histogram of euclidean distance and euclidean distance delta in subplot
+#plot histogram of euclidean distance and euclidean first discrete difference in subplot
 fig_1, ax = plt.subplots(2, 1)
-fig_1.suptitle(suptitle)
+fig_1.suptitle(suptitle, fontsize=fontsize_title)
 ax[0].yaxis.grid(color='gray', linestyle='dashed')
 # ax[0].hist(df['euclidean_distance'], bins=100)
-ax[0].set_title('Euclidean distance')
+ax[0].set_title('Euclidean distance', fontsize=fontsize_title)
 ax[0].set_xlabel('euclidean distance', fontsize=fontsize_xlabel)
 ax[0].set_ylabel('frequency', fontsize=fontsize_ylabel)
 ax[1].yaxis.grid(color='gray', linestyle='dashed')
 # ax[1].hist(df['euclidean_distance_delta'], bins=100)
-ax[1].set_title('First discrete difference of euclidean distance')
-ax[1].set_xlabel('distance delta', fontsize=fontsize_xlabel)
+ax[1].set_title('First discrete difference of euclidean distance', fontsize=fontsize_title)
+ax[1].set_xlabel('first discrete difference', fontsize=fontsize_xlabel)
 ax[1].set_ylabel('frequency', fontsize=fontsize_ylabel)
 ax[0].tick_params(axis='both', which='major', labelsize=labelsize_axes)
 ax[1].tick_params(axis='both', which='major', labelsize=labelsize_axes)
 # set the axis limits to -0.15,0.15
 # ax[0].set_xlim(0,0.15)
 # ax[1].set_xlim(-0.1,0.1)
-# plot the histogram of euclidean distance and euclidean distance delta in subplot
+# plot the histogram of euclidean distance and euclidean first discrete difference in subplot
 ax[0].hist(euclidean_distance_list, bins=bins_euclidean, color=color_list[0:len(euclidean_distance_list)])
 ax[1].hist(euclidean_distance_delta_list, bins=bins_euclidean_delta, color=color_list[0:len(euclidean_distance_delta_list)])
-ax[0].legend(df_type_list)
-ax[1].legend(df_type_list)
+ax[0].legend(df_type_list, fontsize=fontsize_legend)
+ax[1].legend(df_type_list, fontsize=fontsize_legend)
 fig_1.tight_layout(h_pad=2)
 # plt.show()
 
@@ -98,15 +100,15 @@ for i in range(len(df_list)):
     y_diff_list.append(df_list[i]['y_diff'].to_numpy())
 #plot histogram of x_diff and y_diff in subplot
 fig_2, ax = plt.subplots(2, 1)
-fig_2.suptitle(suptitle)
+fig_2.suptitle(suptitle, fontsize=fontsize_title)
 ax[0].yaxis.grid(color='gray', linestyle='dashed')
 # ax[0].hist(df['x_diff'], bins=100)
-ax[0].set_title('Signed distance to ground truth in x dimension')
+ax[0].set_title('Signed distance to ground truth in x dimension', fontsize=fontsize_title)
 ax[0].set_xlabel('distance in x', fontsize=fontsize_xlabel)
 ax[0].set_ylabel('frequency', fontsize=fontsize_ylabel)
 ax[1].yaxis.grid(color='gray', linestyle='dashed')
 # ax[1].hist(df['y_diff'], bins=100)
-ax[1].set_title('Signed distance to ground truth in y dimension')
+ax[1].set_title('Signed distance to ground truth in y dimension', fontsize=fontsize_title)
 ax[1].set_xlabel('distance in y', fontsize=fontsize_xlabel)
 ax[1].set_ylabel('frequency', fontsize=fontsize_ylabel)
 ax[0].tick_params(axis='both', which='major', labelsize=labelsize_axes)
@@ -116,29 +118,29 @@ ax[1].tick_params(axis='both', which='major', labelsize=labelsize_axes)
 # plot the histogram of x_diff and y_diff in subplot
 ax[0].hist(x_diff_list, bins=bins_x, color=color_list[0:len(x_diff_list)])
 ax[1].hist(y_diff_list, bins=bins_y, color=color_list[0:len(y_diff_list)])
-ax[0].legend(df_type_list)
-ax[1].legend(df_type_list)
+ax[0].legend(df_type_list, fontsize=fontsize_legend)
+ax[1].legend(df_type_list, fontsize=fontsize_legend)
 fig_2.tight_layout(h_pad=2)
 # plt.show()
 
 # plot the diffs against the time stamp
 fig_3, ax = plt.subplots(3, 1)
-fig_3.suptitle(suptitle)
+fig_3.suptitle(suptitle, fontsize=fontsize_title)
 ax[0].yaxis.grid(color='gray', linestyle='dashed')
 # ax[0].plot(df['stamp'], df['x_diff'])
-ax[0].set_title('Signed distance to ground truth in x dimension')
+ax[0].set_title('Signed distance to ground truth in x dimension', fontsize=fontsize_title)
 ax[0].set_xlabel('time', fontsize=fontsize_xlabel)
 ax[0].set_ylabel('distance in x', fontsize=fontsize_ylabel)
 ax[1].yaxis.grid(color='gray', linestyle='dashed')
 # ax[1].plot(df['stamp'], df['y_diff'])
-ax[1].set_title('Signed distance to ground truth in y dimension')
+ax[1].set_title('Signed distance to ground truth in y dimension', fontsize=fontsize_title)
 ax[1].set_xlabel('time', fontsize=fontsize_xlabel)
 ax[1].set_ylabel('distance in y', fontsize=fontsize_ylabel)
 ax[0].tick_params(axis='both', which='major', labelsize=labelsize_axes)
 ax[1].tick_params(axis='both', which='major', labelsize=labelsize_axes)
 ax[2].yaxis.grid(color='gray', linestyle='dashed')
 # ax[2].plot(df['stamp'], df['euclidean_distance'])
-ax[2].set_title('Euclidean distance to ground truth')
+ax[2].set_title('Euclidean distance to ground truth', fontsize=fontsize_title)
 ax[2].set_xlabel('time', fontsize=fontsize_xlabel)
 ax[2].set_ylabel('euclidean distance', fontsize=fontsize_ylabel)
 ax[2].tick_params(axis='both', which='major', labelsize=labelsize_axes)
@@ -149,9 +151,9 @@ for i in range(len(df_list)):
     ax[2].plot(df_list[i]['stamp'], df_list[i]['euclidean_distance'], color=color_list[i])
 # make the figure larger in height
 fig_3.set_figheight(8)
-ax[0].legend(df_type_list)
-ax[1].legend(df_type_list)
-ax[2].legend(df_type_list)
+ax[0].legend(df_type_list, fontsize=fontsize_legend_time)
+ax[1].legend(df_type_list, fontsize=fontsize_legend_time)
+ax[2].legend(df_type_list, fontsize=fontsize_legend_time)
 fig_3.tight_layout(h_pad=1)
 
 
