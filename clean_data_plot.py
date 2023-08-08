@@ -89,9 +89,10 @@ for i in range(len(df_list)):
     legend_list_2.append(csv_type_name_list[csv_type_list[i]])
     legend_list_2.append(csv_type_name_list[0])
 
-idx_until = 700
+idx_until = -1
+idx_from = 0
 for i in range(len(df_x_list)):
-    ax[1].plot(df_x_list[i][0:idx_until], df_y_list[i][0:idx_until], color=color_list[i], marker='o', markeredgecolor='black')
+    ax[1].plot(df_x_list[i][idx_from:idx_until], df_y_list[i][idx_from:idx_until], color=color_list[i], marker='o', markeredgecolor='black')
 ax[1].legend(legend_list_2)
 # plot a green x at 0,0
 ax[1].plot(0, 0, color='green', marker='x', linestyle='none')
