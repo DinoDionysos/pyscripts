@@ -3,9 +3,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+
+
 # read the two csv files from the command line
 df_1 = pd.read_csv(sys.argv[1])
 df_2 = pd.read_csv(sys.argv[2])
+
+factor_meter = 1000
+df_1['x'] *= factor_meter 
+df_1['y'] *= factor_meter
+df_1['x_gt'] *= factor_meter
+df_1['y_gt'] *= factor_meter
+df_2['x'] *= factor_meter
+df_2['y'] *= factor_meter
+df_2['x_gt'] *= factor_meter
+df_2['y_gt'] *= factor_meter
 
 # calculate x_diff by x - x_gt
 df_1['x_diff'] = df_1['x'] - df_1['x_gt']
@@ -37,7 +49,10 @@ def mwu_statistic(data_1, data_2):
 
 distances_1 = df_1['euclidean_distance'].to_numpy()
 distances_2 = df_2['euclidean_distance'].to_numpy()
-# drop the first row of both dataframes
+# make in mm
+distances_1 = distances_1
+distances_2 = distances_2
+# drop the first row of both dataframes (0 or nan in both cases)
 distances_1 = distances_1[1:]
 distances_2 = distances_2[1:]
 # shorten both distances to 700
@@ -94,18 +109,6 @@ stat_x, p = mannwhitneyu(distances_1, distances_2, alternative ='two-sided')
 stat_y = distances_1.shape[0] * distances_2.shape[0] - stat_x
 print('mwu Statistics 1 = %.1f \nmwu Statistics 2 = %.1f \np=%.15f' % (stat_x, stat_y, p))
 
-# interpret
-alpha = 0.05
-if p > alpha:
-    print('Same distribution (fail to reject H0)')
-else:
-    print('Different distribution (reject H0)')
-
-# t-test with print
-print('--------------------------------------------------')
-from scipy.stats import ttest_ind
-stat, p = ttest_ind(distances_1, distances_2)
-print('tt Statistics=%.3f \np=%.15f' % (stat, p))
 # interpret
 alpha = 0.05
 if p > alpha:
