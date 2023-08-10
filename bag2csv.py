@@ -16,7 +16,14 @@ bag_name = sys.argv[1]
 # if bag_name starts with bags/, remove it
 if bag_name.startswith('bags/'):
     bag_name = bag_name.replace('bags/', '')
+
+folder_name = bag_name.split('.')[0]
+
 topic_name = sys.argv[2]
+if topic_name == 'gt':
+    topic_name = '/ground_truth/odom'
+elif topic_name == 'orb':
+    topic_name = '/orb_slam3/camera_pose'
 
 if len(sys.argv) == 4:
     topic_type = sys.argv[3]
@@ -55,7 +62,11 @@ csv_file = csv_file.replace('/', '-')
 # replace the . with -
 csv_file = csv_file.replace('.', '-')
 # add .csv to the end of csv_file and place it in the csv folder
-csv_file = "csv/" + csv_file + '.csv'
+csv_file = "csv/" + folder_name +'/'+ csv_file + '.csv'
+
+# if folder does not exist, create it
+if not os.path.exists("csv/" + folder_name):
+    os.makedirs("csv/" + folder_name)
 
 command = 'rostopic echo -b bags/'+bag_name+' -p '+topic_name+' > '+csv_file
 os.system(command)
