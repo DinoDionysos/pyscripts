@@ -22,17 +22,19 @@ linewidth_gt = 2
 linewidth_data = 2
 suptitle = 'ORB SLAM3 stereo and ORB SLAM3 rgbd' # overall title on the very top
 color_list = ['red', 'black', 'blue', 'green', 'orange', 'purple', 'pink', 'cyan', 'yellow']
-df_type_list_overwrite = ['stereo', 'rgb'] # leaf blank if no overwrite
+df_type_list_overwrite = [] # leaf blank if no overwrite
 
+factor_meter = 1000
 bins_x_number = 50
 bins_y_number = bins_x_number
-bins_x = np.linspace(-0.15,0.15,bins_x_number)
-bins_y = np.linspace(-0.1,0.1,bins_y_number)
+bins_x = np.linspace(-150,150,bins_x_number)
+bins_y = np.linspace(-100,100,bins_y_number)
 
-bins_euclidean_number = 50
-bins_euclidean_delta_number = bins_euclidean_number 
-bins_euclidean = np.linspace(0,0.15,bins_euclidean_number)
-bins_euclidean_delta = np.linspace(-0.1,0.1,bins_euclidean_delta_number)
+bins_euclidean_number = 100
+bins_euclidean_ffd_number = bins_euclidean_number 
+bins_euclidean = np.linspace(0,150,bins_euclidean_number)
+bins_euclidean_ffd = np.linspace(-100,100,bins_euclidean_ffd_number)
+
 
 
 
@@ -50,18 +52,26 @@ for i in range(1, len(sys.argv)):
     last_part_of_arg = last_part_of_arg.replace('-bag', '')
     df_type_list.append(last_part_of_arg)
 
+#convert x, y, ... to mm
+for i in range(len(df_list)):
+    df_list[i]['x'] = df_list[i]['x'] * factor_meter
+    df_list[i]['y'] = df_list[i]['y'] * factor_meter
+    df_list[i]['x_gt'] = df_list[i]['x_gt'] * factor_meter
+    df_list[i]['y_gt'] = df_list[i]['y_gt'] * factor_meter
 
 # calculate the euclidean distance between the ground truth and the data without z
 for i in range(len(df_list)):
     df_list[i]['euclidean_distance'] = ((df_list[i]['x'] - df_list[i]['x_gt'])**2 + (df_list[i]['y'] - df_list[i]['y_gt'])**2)**0.5
+    # mm
+    df_list[i]['euclidean_distance'] = df_list[i]['euclidean_distance']
     # diff too
-    df_list[i]['euclidean_distance_delta'] = df_list[i]['euclidean_distance'].diff()
-# put all the euclidean_distance and euclidean_distance_delta into a list as np.array
+    df_list[i]['euclidean_distance_ffd'] = df_list[i]['euclidean_distance'].diff()
+# put all the euclidean_distance and euclidean_distance_ffd into a list as np.array
 euclidean_distance_list = []
-euclidean_distance_delta_list = []
+euclidean_distance_ffd_list = []
 for i in range(len(df_list)):
     euclidean_distance_list.append(df_list[i]['euclidean_distance'].to_numpy())
-    euclidean_distance_delta_list.append(df_list[i]['euclidean_distance_delta'].to_numpy()[1:])
+    euclidean_distance_ffd_list.append(df_list[i]['euclidean_distance_ffd'].to_numpy()[1:])
 
 # #calculate the difference between the x and y columns of the ground truth and the data
 for i in range(len(df_list)):
@@ -84,7 +94,7 @@ ax[0].set_title('Euclidean distance', fontsize=fontsize_title)
 ax[0].set_xlabel('euclidean distance', fontsize=fontsize_xlabel)
 ax[0].set_ylabel('frequency', fontsize=fontsize_ylabel)
 ax[1].yaxis.grid(color='gray', linestyle='dashed')
-# ax[1].hist(df['euclidean_distance_delta'], bins=100)
+# ax[1].hist(df['euclidean_distance_ffd'], bins=100)
 ax[1].set_title('First discrete difference of euclidean distance', fontsize=fontsize_title)
 ax[1].set_xlabel('first discrete difference', fontsize=fontsize_xlabel)
 ax[1].set_ylabel('frequency', fontsize=fontsize_ylabel)
@@ -95,38 +105,38 @@ ax[1].tick_params(axis='both', which='major', labelsize=labelsize_axes)
 # ax[1].set_xlim(-0.1,0.1)
 # plot the histogram of euclidean distance and euclidean first discrete difference in subplot
 ax[0].hist(euclidean_distance_list, bins=bins_euclidean, color=color_list[0:len(euclidean_distance_list)])
-ax[1].hist(euclidean_distance_delta_list, bins=bins_euclidean_delta, color=color_list[0:len(euclidean_distance_delta_list)])
+ax[1].hist(euclidean_distance_ffd_list, bins=bins_euclidean_ffd, color=color_list[0:len(euclidean_distance_ffd_list)])
 ax[0].legend(df_type_list, fontsize=fontsize_legend)
 ax[1].legend(df_type_list, fontsize=fontsize_legend)
 fig_1.tight_layout(h_pad=2)
-# plt.show()
+plt.show(block=False)
 
 
 
-#plot histogram of x_diff and y_diff in subplot
-fig_2, ax = plt.subplots(2, 1)
-fig_2.suptitle(suptitle, fontsize=fontsize_title)
-ax[0].yaxis.grid(color='gray', linestyle='dashed')
-# ax[0].hist(df['x_diff'], bins=100)
-ax[0].set_title('Signed distance to ground truth in x dimension', fontsize=fontsize_title)
-ax[0].set_xlabel('distance in x', fontsize=fontsize_xlabel)
-ax[0].set_ylabel('frequency', fontsize=fontsize_ylabel)
-ax[1].yaxis.grid(color='gray', linestyle='dashed')
-# ax[1].hist(df['y_diff'], bins=100)
-ax[1].set_title('Signed distance to ground truth in y dimension', fontsize=fontsize_title)
-ax[1].set_xlabel('distance in y', fontsize=fontsize_xlabel)
-ax[1].set_ylabel('frequency', fontsize=fontsize_ylabel)
-ax[0].tick_params(axis='both', which='major', labelsize=labelsize_axes)
-ax[1].tick_params(axis='both', which='major', labelsize=labelsize_axes)
-# ax[0].set_xlim(-0.15,0.15)
-# ax[1].set_xlim(-0.1,0.1)
-# plot the histogram of x_diff and y_diff in subplot
-ax[0].hist(x_diff_list, bins=bins_x, color=color_list[0:len(x_diff_list)])
-ax[1].hist(y_diff_list, bins=bins_y, color=color_list[0:len(y_diff_list)])
-ax[0].legend(df_type_list, fontsize=fontsize_legend)
-ax[1].legend(df_type_list, fontsize=fontsize_legend)
-fig_2.tight_layout(h_pad=2)
-# plt.show()
+# #plot histogram of x_diff and y_diff in subplot
+# fig_2, ax = plt.subplots(2, 1)
+# fig_2.suptitle(suptitle, fontsize=fontsize_title)
+# ax[0].yaxis.grid(color='gray', linestyle='dashed')
+# # ax[0].hist(df['x_diff'], bins=100)
+# ax[0].set_title('Signed distance to ground truth in x dimension', fontsize=fontsize_title)
+# ax[0].set_xlabel('distance in x', fontsize=fontsize_xlabel)
+# ax[0].set_ylabel('frequency', fontsize=fontsize_ylabel)
+# ax[1].yaxis.grid(color='gray', linestyle='dashed')
+# # ax[1].hist(df['y_diff'], bins=100)
+# ax[1].set_title('Signed distance to ground truth in y dimension', fontsize=fontsize_title)
+# ax[1].set_xlabel('distance in y', fontsize=fontsize_xlabel)
+# ax[1].set_ylabel('frequency', fontsize=fontsize_ylabel)
+# ax[0].tick_params(axis='both', which='major', labelsize=labelsize_axes)
+# ax[1].tick_params(axis='both', which='major', labelsize=labelsize_axes)
+# # ax[0].set_xlim(-0.15,0.15)
+# # ax[1].set_xlim(-0.1,0.1)
+# # plot the histogram of x_diff and y_diff in subplot
+# ax[0].hist(x_diff_list, bins=bins_x, color=color_list[0:len(x_diff_list)])
+# ax[1].hist(y_diff_list, bins=bins_y, color=color_list[0:len(y_diff_list)])
+# ax[0].legend(df_type_list, fontsize=fontsize_legend)
+# ax[1].legend(df_type_list, fontsize=fontsize_legend)
+# fig_2.tight_layout(h_pad=2)
+# # plt.show()
 
 # plot the diffs against the time stamp
 fig_3, ax = plt.subplots(3, 1)
@@ -185,23 +195,23 @@ else:
         print("saved: " + save_name_fig_1)
     else:
         print("did not save: " + save_name_fig_1)
-# figure 2
-if os.path.exists(folder_2 + '/' + save_name_fig_2):
-    prompt = input("If you want to overwrite " + save_name_fig_2 + " type 'y' and enter: ")
-    if prompt == 'y':
-        fig_2.savefig(folder_2 + '/' + save_name_fig_2)
-        # fig_2.savefig(folder_1 + '/' + save_name_fig_2)
-        print("saved: " + save_name_fig_2)
-    else:
-        print("did not save: " + save_name_fig_2)
-else:
-    prompt = input("If you want to save " + save_name_fig_2 + " type 'y' and enter: ")
-    if prompt == 'y':
-        fig_2.savefig(folder_2 + '/' + save_name_fig_2)
-        # fig_2.savefig(folder_1 + '/' + save_name_fig_2)
-        print("saved: " + save_name_fig_2)
-    else:
-        print("did not save: " + save_name_fig_2)
+# # figure 2
+# if os.path.exists(folder_2 + '/' + save_name_fig_2):
+#     prompt = input("If you want to overwrite " + save_name_fig_2 + " type 'y' and enter: ")
+#     if prompt == 'y':
+#         fig_2.savefig(folder_2 + '/' + save_name_fig_2)
+#         # fig_2.savefig(folder_1 + '/' + save_name_fig_2)
+#         print("saved: " + save_name_fig_2)
+#     else:
+#         print("did not save: " + save_name_fig_2)
+# else:
+#     prompt = input("If you want to save " + save_name_fig_2 + " type 'y' and enter: ")
+#     if prompt == 'y':
+#         fig_2.savefig(folder_2 + '/' + save_name_fig_2)
+#         # fig_2.savefig(folder_1 + '/' + save_name_fig_2)
+#         print("saved: " + save_name_fig_2)
+#     else:
+#         print("did not save: " + save_name_fig_2)
 # figure 3
 if os.path.exists(folder_2 + '/' + save_name_fig_3):
     prompt = input("If you want to overwrite " + save_name_fig_3 + " type 'y' and enter: ")
