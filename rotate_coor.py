@@ -2,12 +2,16 @@ import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 plt.style.use('dark_background')
 plt.rcParams.update({
     "axes.facecolor": (0.3,0.3,0.3),
     "figure.facecolor": (0.1,0.1,0.1),
     "grid.color": (0.3,0.3,0.3)}),
+
+folder_name = sys.argv[1].split('/')[2]
+print(folder_name) 
 
 # load the csv second argument 
 df_gt = pd.read_csv(sys.argv[1])
@@ -85,16 +89,29 @@ true_points -= true_points[0]
 mapping_points -= mapping_points[0]
 mapped_xyz -= mapped_xyz[0]
 
-# make a dataframe from the mapped_xyz, true_points and timestamps
-df_data = pd.DataFrame({'stamp': df_data_timestamp, 'x': mapped_xyz[:,0], 'y': mapped_xyz[:,1], 'x_gt': true_points[:,0], 'y_gt': true_points[:,1]})
+# calculate the euclidean distance between the mapped_xyz and true_points
+euclidean_distance = np.linalg.norm(mapped_xyz - true_points, axis=1)
+# calculate the diff of the euclidean distance
+euclidean_distance_diff = np.diff(euclidean_distance)
+# append a zero to the euclidean_distance_diff at the front
+euclidean_distance_diff = np.insert(euclidean_distance_diff, 0, 0)
+# *1000
+euclidean_distance_diff = euclidean_distance_diff * 1000
+euclidean_distance = euclidean_distance * 1000
+# make a dataframe from the mapped_xyz, true_points and timestamps and euclidean_distance and euclidean_distance_diff
+df_data = pd.DataFrame({'stamp': df_data_timestamp, 'x': mapped_xyz[:,0], 'y': mapped_xyz[:,1], 'x_gt': true_points[:,0], 'y_gt': true_points[:,1], 'dist': euclidean_distance, 'ffd': euclidean_distance_diff})
+
 
 # split the argument 1 by '/' and get the last part
-csv_file = 'csv/aligned/' + sys.argv[1].split('/')[-1].split('.')[0]
+csv_file = 'csv/aligned/' + folder_name +'/'+ sys.argv[1].split('/')[-1].split('.')[0]
 csv_file += '_vs_' + sys.argv[2].split('/')[1].split('--')[0] + '.csv'
 # csv_file += '_vs_' + sys.argv[2].split('/')[1]
 # csv_file += '_vs_' + sys.argv[2].split('/')[1]
 # csv_file += '_vs_' + sys.argv[2].split('/')[1]
 # save the dataframe as csv
+# if folder_name does not exist create it
+if not os.path.exists('csv/aligned/' + folder_name):
+    os.makedirs('csv/aligned/' + folder_name)
 print(csv_file)
 df_data.to_csv(csv_file, index=False)
 
