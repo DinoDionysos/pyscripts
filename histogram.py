@@ -61,7 +61,20 @@ euclidean_distance_list = []
 euclidean_distance_delta_list = []
 for i in range(len(df_list)):
     euclidean_distance_list.append(df_list[i]['euclidean_distance'].to_numpy())
-    euclidean_distance_delta_list.append(df_list[i]['euclidean_distance_delta'].to_numpy())
+    euclidean_distance_delta_list.append(df_list[i]['euclidean_distance_delta'].to_numpy()[1:])
+
+# #calculate the difference between the x and y columns of the ground truth and the data
+for i in range(len(df_list)):
+    df_list[i]['x_diff'] = df_list[i]['x'] - df_list[i]['x_gt']
+    df_list[i]['y_diff'] = df_list[i]['y'] - df_list[i]['y_gt']
+# put all the x_diff and y_diff into a list as np.array
+x_diff_list = []
+y_diff_list = []
+for i in range(len(df_list)):
+    x_diff_list.append(df_list[i]['x_diff'].to_numpy())
+    y_diff_list.append(df_list[i]['y_diff'].to_numpy())
+
+
 #plot histogram of euclidean distance and euclidean first discrete difference in subplot
 fig_1, ax = plt.subplots(2, 1)
 fig_1.suptitle(suptitle, fontsize=fontsize_title)
@@ -88,16 +101,8 @@ ax[1].legend(df_type_list, fontsize=fontsize_legend)
 fig_1.tight_layout(h_pad=2)
 # plt.show()
 
-# #calculate the difference between the x and y columns of the ground truth and the data
-for i in range(len(df_list)):
-    df_list[i]['x_diff'] = df_list[i]['x'] - df_list[i]['x_gt']
-    df_list[i]['y_diff'] = df_list[i]['y'] - df_list[i]['y_gt']
-# put all the x_diff and y_diff into a list as np.array
-x_diff_list = []
-y_diff_list = []
-for i in range(len(df_list)):
-    x_diff_list.append(df_list[i]['x_diff'].to_numpy())
-    y_diff_list.append(df_list[i]['y_diff'].to_numpy())
+
+
 #plot histogram of x_diff and y_diff in subplot
 fig_2, ax = plt.subplots(2, 1)
 fig_2.suptitle(suptitle, fontsize=fontsize_title)
