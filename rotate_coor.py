@@ -10,6 +10,8 @@ plt.rcParams.update({
     "figure.facecolor": (0.1,0.1,0.1),
     "grid.color": (0.3,0.3,0.3)}),
 
+pos_fig_x = 1200
+pos_fig_y = 100
 folder_name = sys.argv[1].split('/')[2]
 print(folder_name) 
 
@@ -115,6 +117,8 @@ if not os.path.exists('csv/aligned/' + folder_name):
 print(csv_file)
 df_data.to_csv(csv_file, index=False)
 
+# keep reference to figure
+fig = plt.figure()
 # plot the x y of mapped_xyz and true_points
 # make the scale of x and y equal
 plt.axis('equal')
@@ -123,8 +127,11 @@ for i in range(len(true_points)):
     plt.plot([true_points[i,0], mapped_xyz[i,0]], [true_points[i,1], mapped_xyz[i,1]], color='gray')
 plt.plot(true_points[:,0], true_points[:,1], marker='o', markeredgecolor='black', label='true')
 plt.plot(mapped_xyz[:,0], mapped_xyz[:,1], marker='o', markeredgecolor='black', label='mapped')
-
 plt.legend()
+mngr = plt.get_current_fig_manager()
+geom = mngr.window.geometry()
+x,y,dx,dy = geom.getRect()
+mngr.window.setGeometry(pos_fig_x, pos_fig_y, dx*2, dy*2)
 plt.show()
 
 
