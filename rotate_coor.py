@@ -59,7 +59,9 @@ true_points = true_points.T
 mapping_points = mapping_points.T
 
 
-# kapsch algorithm from https://stackoverflow.com/questions/60877274/optimal-rotation-in-3d-with-kabsch-algorithm
+# kabsch algorithm from https://stackoverflow.com/questions/60877274/optimal-rotation-in-3d-with-kabsch-algorithm
+# as far as I understand it resembles the horn method implementations that I have seen like ein horn_demo.py. The difference seems laut wikipedia that horn is in qaternion and kabsch is in rotation matrix.
+#For an alternative kabsch implementation see here https://zpl.fi/aligning-point-patterns-with-kabsch-umeyama-algorithm/
 
 mapped_centroid = np.average(mapping_points, axis=0)
 true_centroid = np.average(true_points, axis=0)
@@ -72,6 +74,10 @@ u, s, vt = np.linalg.svd(h)
 v = vt.T
 
 d = np.linalg.det(v @ u.T)
+# get the sign of d
+d = np.sign(d) 
+# solution from stackoverflow does not implement the sign here? wikipedia says it should be and the horn_demo.py also does it.
+# https://en.wikipedia.org/wiki/Kabsch_algorithm
 e = np.array([[1, 0, 0], [0, 1, 0], [0, 0, d]])
 
 r = v @ e @ u.T
