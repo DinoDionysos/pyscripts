@@ -132,7 +132,10 @@ mngr = plt.get_current_fig_manager()
 geom = mngr.window.geometry()
 x,y,dx,dy = geom.getRect()
 mngr.window.setGeometry(pos_fig_x, pos_fig_y, dx*2, dy*2)
-plt.show()
+
+plt.show(block=False)
+plt.pause(2)
+plt.close(fig)
 
 
 
