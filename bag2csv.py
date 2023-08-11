@@ -17,9 +17,11 @@ bag_name = sys.argv[1]
 if bag_name.startswith('bags/'):
     bag_name = bag_name.replace('bags/', '')
 
-folder_name = bag_name.split('.')[0]
+folder_name = bag_name.split('/')[0] +'/'+bag_name.split('/')[1]
+print("[INFO] "+file_name+" | folder_name: " + folder_name)
 
 topic_name = sys.argv[2]
+topic_name_str = topic_name
 if topic_name == 'gt':
     topic_name = '/ground_truth/odom'
 elif topic_name == 'orb':
@@ -54,19 +56,15 @@ else:
 
 
 # make csv_file the combination of first and second
-csv_file = bag_name + '-' + topic_name
-# if there is a / in csv_file, before '.bag', remove everything before the first /
-csv_file = csv_file.split('/',1)[1]
-# replace the / with -
-csv_file = csv_file.replace('/', '-')
-# replace the . with -
-csv_file = csv_file.replace('.', '-')
+csv_file = bag_name.split('/')[2].split('.')[0] + '-' + topic_name_str
 # add .csv to the end of csv_file and place it in the csv folder
 csv_file = "csv/" + folder_name +'/'+ csv_file + '.csv'
 
 # if folder does not exist, create it
 if not os.path.exists("csv/" + folder_name):
     os.makedirs("csv/" + folder_name)
+    #print
+    print("[INFO] "+file_name+" | created folder: " + "csv/" + folder_name)
 
 command = 'rostopic echo -b bags/'+bag_name+' -p '+topic_name+' > '+csv_file
 os.system(command)
