@@ -30,7 +30,7 @@ if len(sys.argv) == 4:
 else:
     # excecute the command: "rosbag info test_orbmono_vs_gt.bag -y -k topics" and read the output into a variable
     output = os.popen('rosbag info bags/'+bag_name+' -y -k topics').read()
-    print(output)
+    # print(output)
 
     # split the output. an entry begins with '-'
     output = output.split('-')
