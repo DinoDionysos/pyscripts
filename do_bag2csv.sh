@@ -1,4 +1,6 @@
 #!/bin/bash
+#$1: start index for the files
+#$2: end index
 
 
 file_prefix="c7_orb_stereo"
