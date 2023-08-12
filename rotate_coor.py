@@ -83,6 +83,9 @@ e = np.array([[1, 0, 0], [0, 1, 0], [0, 0, d]])
 r = v @ e @ u.T
 tt = true_centroid - np.matmul(r, mapped_centroid)
 
+true_points += true_centroid
+mapping_points += mapped_centroid
+
 #mapping
 map_list = []
 for i in mapping_points:
@@ -90,9 +93,8 @@ for i in mapping_points:
     map_list.append(np.reshape(point, (1, 3)))
 mapped_xyz = np.vstack(map_list)
 
-true_points += true_centroid
-mapping_points += mapped_centroid
-#normalize the such that the first point is 0,0
+
+# normalize such that the first point is 0,0
 true_points -= true_points[0]
 mapping_points -= mapping_points[0]
 mapped_xyz -= mapped_xyz[0]
