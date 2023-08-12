@@ -18,7 +18,7 @@ if bag_name.startswith('bags/'):
     bag_name = bag_name.replace('bags/', '')
 
 folder_name = bag_name.split('/')[0] +'/'+bag_name.split('/')[1]
-print("[INFO] "+file_name+" | folder_name: " + folder_name)
+# print("[INFO] "+file_name+" | folder_name: " + folder_name)
 
 topic_name = sys.argv[2]
 topic_name_str = topic_name
@@ -45,10 +45,10 @@ else:
         candiate = cell.split('topic: ')[1].split('\n')[0]
         # compare the candidate with the topic_name
         if candiate == topic_name:
-            print("[INFO] "+file_name+" | found topic name in bag info: " + topic_name)
+            # print("[INFO] "+file_name+" | found topic name in bag info: " + topic_name)
             # get the word between "type:" and "\n"
             topic_type = cell.split('type: ')[1].split('\n')[0]
-            print("[INFO] "+file_name+" | found topic type: " + topic_type)
+            # print("[INFO] "+file_name+" | found topic type: " + topic_type)
 
     if topic_type == "":
         print("[INFO] "+file_name+" | The topic type could not be resolved from the topic name: " + topic_name + " and the bag: " + bag_name + ".\nPlease provide the topic type as the third argument. f.e. nav_msgs/Odometry")
@@ -73,7 +73,7 @@ print("[INFO] "+file_name+" | executing: " + command)
 
 # load csv/test_orbmono_vs_gt-ground_truthodom.csv from /csv as dataframe
 df = pd.read_csv(csv_file)
-print("[INFO] "+file_name+" | loaded: " + csv_file)
+# print("[INFO] "+file_name+" | loaded: " + csv_file)
 
 
 
@@ -125,4 +125,4 @@ df['z'] = df['z'] - df['z'][0]
 
 # save csv as csv_file
 df.to_csv(csv_file, index=False)
-print("[INFO] "+file_name+" | saved to: " + csv_file)
+# print("[INFO] "+file_name+" | saved to: " + csv_file)
