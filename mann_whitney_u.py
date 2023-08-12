@@ -40,29 +40,26 @@ for i in range(int(range_1), int(range_2)):
     if p > alpha_mwu:
         print('Same distribution (fail to reject H0) pvalue=%d' % p)
     else:
-        print('Different distribution (reject H0) pvalue=%d' % p)
+        print('Different distribution (reject H0) pvalue=%.15f' % p)
 pmean_mwu_test = np.mean(pvalues_mwu_test)
-print('mean pvalue = %.15f' % pmean_mwu_test)
-# print hello without newline after
-print('hello', end='')
+print('mean pvalue = %.15f ' % pmean_mwu_test)
 
-# alpha_ks = 0.05
-# pvalues_ks_test = []
-# for i in range(int(range_1), int(range_2)):
-#     distances_1 = df_list_1[i]['euclidean_distance'].to_numpy()
-#     distances_2 = df_list_2[i]['euclidean_distance'].to_numpy()
-#     # kologorov smirnov test
-#     print('--------------------------------------------------')
-#     from scipy.stats import ks_2samp
-#     stat, p = ks_2samp(distances_1, distances_2)
-#     pvalues_ks_test.append(p)
-#     print('KS Statistics=%.3f, p=%.15f' % (stat, p), end='')
-#     if p > alpha_ks:
-#         print('Same distribution (fail to reject H0)')
-#     else:
-#         print('Different distribution (reject H0)')
-# pmean_ks_test = np.mean(pvalues_ks_test)
-# print('mean pvalue = %.15f' % pmean_ks_test)
+alpha_ks = 0.05
+pvalues_ks_test = []
+for i in range(int(range_1), int(range_2)):
+    distances_1 = df_list_1[i]['dist'].to_numpy()
+    distances_2 = df_list_2[i]['dist'].to_numpy()
+    # kologorov smirnov test
+    from scipy.stats import ks_2samp
+    stat, p = ks_2samp(distances_1, distances_2)
+    pvalues_ks_test.append(p)
+    print('KS Statistics=%.3f, p=%.15f' % (stat, p), end='')
+    if p > alpha_ks:
+        print('Same distribution (fail to reject H0)')
+    else:
+        print('Different distribution (reject H0)')
+pmean_ks_test = np.mean(pvalues_ks_test)
+print('mean pvalue = %.15f ' % pmean_ks_test)
 
 
 
