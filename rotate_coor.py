@@ -113,9 +113,6 @@ df_data = pd.DataFrame({'stamp': df_data_timestamp, 'x': mapped_xyz[:,0], 'y': m
 # split the argument 1 by '/' and get the last part
 csv_file = 'csv/aligned/' + folder_name +'/'+ sys.argv[1].split('/')[-1].split('.')[0]
 csv_file += '_vs_' + sys.argv[2].split('/')[1].split('--')[0] + '.csv'
-# csv_file += '_vs_' + sys.argv[2].split('/')[1]
-# csv_file += '_vs_' + sys.argv[2].split('/')[1]
-# csv_file += '_vs_' + sys.argv[2].split('/')[1]
 # save the dataframe as csv
 # if folder_name does not exist create it
 if not os.path.exists('csv/aligned/' + folder_name):
