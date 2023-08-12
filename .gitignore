@@ -4,3 +4,4 @@ bags_windows_shortcut.lnk
 copy_figures.py
 .vscode/*
 horn_demo.py
+__pycache__/*
