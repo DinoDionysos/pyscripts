@@ -136,7 +136,12 @@ geom = mngr.window.geometry()
 x,y,dx,dy = geom.getRect()
 mngr.window.setGeometry(pos_fig_x, pos_fig_y, dx*2, dy*2)
 
-plt.show(block=False)
+# print the accumulated euclidean distance
+print('accumulated euclidean distance: ', np.sum(euclidean_distance))
+# print the accumulated euclidean distance diff
+print('accumulated euclidean distance diff: ', np.sum(euclidean_distance_diff))# print the accumulated euclidean distance diff but absolute
+print('accumulated euclidean distance diff abs: ', np.sum(np.abs(euclidean_distance_diff)))
+plt.show(block=True)
 plt.pause(2)
 plt.close(fig)
 
