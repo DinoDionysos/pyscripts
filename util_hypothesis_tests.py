@@ -2,6 +2,9 @@
 import numpy as np
 from scipy.stats import mannwhitneyu
 from scipy.stats import ks_2samp
+import os
+import pandas as pd
+
 
 
 def mannwhitneyu_print(data_1, data_2, alpha, print_res=True):
@@ -55,9 +58,9 @@ def mannwhitneyu_n(dist_list_1, dist_list_2, alpha, print_every=True):
     print('mean pvalue = %.15f ' % pmean_mwu_test)
     return pmean_mwu_test, pvalues_mwu_test
 
-def kolomogorov_print(data_1, data_2, alpha, print_res=True):
+def kolmogorov_print(data_1, data_2, alpha, print_res=True):
     """
-    perform a kolomogorov smirnov test.
+    perform a kolmogorov smirnov test.
     prints the results if print_res=True.
  
     Args:
@@ -67,8 +70,8 @@ def kolomogorov_print(data_1, data_2, alpha, print_res=True):
         print_res=True (bool): print results or not 
  
     Returns:
-        stat (float): test statistic of kolomogorov smirnov test
-        p (float): p values of kolomogorov smirnov test
+        stat (float): test statistic of kolmogorov smirnov test
+        p (float): p values of kolmogorov smirnov test
     """
     #
     stat, p = ks_2samp(data_1, data_2)
@@ -80,9 +83,9 @@ def kolomogorov_print(data_1, data_2, alpha, print_res=True):
             print('Different distribution (reject H0) pvalue=%.15f' % p)
     return stat, p
 
-def kolomogorov_n(dist_list_1, dist_list_2, alpha, print_every=True):
+def kolmogorov_n(dist_list_1, dist_list_2, alpha, print_every=True):
     """
-    perform a two sided kolomogorov smirnov test on every array with the same index given in dist_list_1 and dist_list_2. Then takes the mean of the p values and prints them
+    perform a two sided kolmogorov smirnov test on every array with the same index given in dist_list_1 and dist_list_2. Then takes the mean of the p values and prints them
     prints all the results of the pairwise tests, if print_res=True.
  
     Args:
@@ -93,14 +96,14 @@ def kolomogorov_n(dist_list_1, dist_list_2, alpha, print_every=True):
  
     Returns:
         pmean_mwu_test (float): mean of all the p values
-        pvalues_mwu_test (list of float): all the p values of the kolomogorov smirnov tests
+        pvalues_mwu_test (list of float): all the p values of the kolmogorov smirnov tests
     """
     assert len(dist_list_1) == len(dist_list_2), "length of lists are not the same: length 1 = {len(dist_list_1)}, length 2 = len(dist_list_2) "
     pvalues_mwu_test = []
     for i in range(0, len(dist_list_1)):
         if print_every:
             print(i," ", end='')
-        stat, p = kolomogorov_print(dist_list_1[i], dist_list_2[i], alpha, print_every)
+        stat, p = kolmogorov_print(dist_list_1[i], dist_list_2[i], alpha, print_every)
         pvalues_mwu_test.append(p) 
     pmean_mwu_test = np.mean(pvalues_mwu_test)
     print('mean pvalue = %.15f ' % pmean_mwu_test)
@@ -137,7 +140,10 @@ def hypotest_folder(test_name, folder_1, folder_2, col_name, alpha, print_every=
         if test_name == "mwu" or test_name == "mannwhitneyu":
             pmean, pvalues = mannwhitneyu_n(columns[0:len_cols_half], columns[len_cols_half:2*len_cols_half], alpha, print_every=print_every)
         elif test_name == "ks" or test_name == "kstest" or test_name == "kolmogorov":
-            pmean, pvalues = kolomogorov_n(columns[0:len_cols_half], columns[len_cols_half:2*len_cols_half], alpha, print_every=print_every)
+            pmean, pvalues = kolmogorov_n(columns[0:len_cols_half], columns[len_cols_half:2*len_cols_half], alpha, print_every=print_every)
+        else:
+            print("hypotest_folder(...): test_name not recognized. default to kolmogorov")
+            pmean, pvalues = kolmogorov_n(columns[0:len_cols_half], columns[len_cols_half:2*len_cols_half], alpha, print_every=print_every)
         # append some -1 to the pvalues list to make it the same length as the columns list
         pvalues = np.append(pvalues, (-1) * np.ones(len(columns)-len_cols_half))
         return pmean, pvalues
@@ -148,12 +154,15 @@ def hypotest_folder(test_name, folder_1, folder_2, col_name, alpha, print_every=
         if test_name == "mwu" or test_name == "mannwhitneyu":
             pmean, pvalues = mannwhitneyu_n(columns_1, columns_2, alpha, print_every=print_every)
         elif test_name == "ks" or test_name == "kstest" or test_name == "kolmogorov":
-            pmean, pvalues = kolomogorov_n(columns_1, columns_2, alpha, print_every=print_every)
+            pmean, pvalues = kolmogorov_n(columns_1, columns_2, alpha, print_every=print_every)
+        else:
+            print("hypotest_folder(...): test_name not recognized. default to kolmogorov")
+            pmean, pvalues = kolmogorov_n(columns_1, columns_2, alpha, print_every=print_every)
         return pmean, pvalues
 
 def mean_hypo(test_name, csv_folders, col_name, alpha,print_every=True):
     """
-    takes a test name and tests the data in the csv folders against each other. returns the rsults in a numpy array.
+    takes a test name and tests the data in the csv folders against each other. returns the results in a numpy array.
     """
     num_folders = len(csv_folders)
     pmean_values = (-1) * np.ones((num_folders, num_folders))
@@ -167,3 +176,4 @@ def mean_hypo(test_name, csv_folders, col_name, alpha,print_every=True):
             pmean_values[i][j] = pmean
             pvalues_list.append(pvalues)
     return pmean_values, pvalues_list
+
