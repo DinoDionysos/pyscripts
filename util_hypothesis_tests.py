@@ -177,3 +177,75 @@ def mean_hypo(test_name, csv_folders, col_name, alpha,print_every=True):
             pvalues_list.append(pvalues)
     return pmean_values, pvalues_list
 
+def make_mean_table(df, folder_save, test_name, col_name, caption, label, precision=6, save=True):
+    # take the mean p values and make a latex table out of it
+    df_latex = "\centering\n"
+    df_latex += df.to_latex(header=True, float_format=f"%.{precision}f", index=True)
+    df_latex = df_latex.replace('-1.' + '0' * precision, '-')
+    # append the caption and label to the latex table string
+    df_latex += "\caption{"+caption+"}\n\label{"+label+"}\n"
+    if save:
+        with open(folder_save+f'result_pmean_{test_name}_{col_name}.tex', 'w') as f:
+            f.write(df_latex)
+    return df_latex
+
+def make_pvalues_table(df, folder_save, test_name, col_name, caption, label, precision=6, save=True):
+    # take the mean p values and make a latex table out of it
+    df_latex = "\centering\n"
+    df_latex += df.to_latex(header=True, float_format=f"%.{precision}f", index=True)
+    df_latex = df_latex.replace('-1.' + '0' * precision, '-')
+    df_latex = df_latex.replace('\nmean &', '\n\midrule\nmean &')
+    # append the caption and label to the latex table string
+    df_latex += "\caption{"+caption+"}\n\label{"+label+"}\n"
+    if save:
+        with open(folder_save+f'result_pvalues_{test_name}_{col_name}.tex', 'w') as f:
+            f.write(df_latex)
+    return df_latex
+
+def make_pvalues_df(pvalues, pmean_values, folders, alpha):
+    df_pvalues = pd.DataFrame()
+    # for every entry of pvalues, make a new column in the dataframe
+    for i in range(0, len(pvalues)):
+        df_pvalues[str(i)] = pvalues[i]
+    df_pvalues.columns = ['stereo stereo', 'stereo rgbd', 'rgbd rgbd'] 
+    # add a row at the bottom with the mean of the pvalues
+    pmean_values_flat = []
+    for i in range(0, len(folders)):
+        for j in range(0, len(folders)):
+            if i < j: 
+                break
+            pmean_values_flat.append(pmean_values[i][j])
+    df_pvalues.loc['mean'] = pmean_values_flat
+    # make another row with if mean is > alpha than say 'rejected' else 'failed to reject'
+    rejected = df_pvalues.loc['mean'] < alpha
+    rejected = rejected.replace(True, 'rejected')
+    rejected = rejected.replace(False, 'failed')
+    df_pvalues.loc['result'] = rejected
+    return df_pvalues
+
+def col_names_from_folders(folders):
+    column_names = []
+    for name in folders:
+        column_names.append(name.split('/')[-1].split('_',1)[1].replace('_','\_'))
+    return column_names
+
+def make_tables_from_experiment(folder_save, test_name, col_name, folders, alpha, precision=6, print_every=True):
+    caption = f"mean p values over 20 experiments for the {test_name} test on {col_name}"
+    label = f"tab:mean_pvalues_{test_name}_{col_name}"
+    column_names = col_names_from_folders(folders)
+
+    pmean_values, pvalues = mean_hypo(test_name, folders, col_name, alpha, 
+    print_every = print_every)
+    df = pd.DataFrame(pmean_values, columns = column_names, index=column_names)
+    # take the mean p values and make a latex table out of it and save it
+    df_mean_latex = make_mean_table(df, folder_save, test_name, col_name, caption, label, precision, save=True)
+
+    # take pvalues and make a latex table out of it
+    caption = f"p values for the {test_name} test on {col_name}"
+    label = f"tab:pvalues_{test_name}_{col_name}"
+    pvalues = np.array(pvalues)
+    df_pvalues = make_pvalues_df(pvalues, pmean_values, folders, alpha)
+
+    # make a latex table out of it
+    df_pvalues_latex = make_pvalues_table(df_pvalues, folder_save, test_name, col_name, caption, label, precision, save=True)
+    return df_mean_latex, df_pvalues_latex
