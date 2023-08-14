@@ -178,6 +178,7 @@ def mean_hypo(test_name, csv_folders, col_name, alpha,print_every=True):
     return pmean_values, pvalues_list
 
 def make_mean_table(df, folder_save, test_name, col_name, caption, label, precision=6, save=True):
+    """takes the mean values from the experiments as dataframe and turns it into a latex table."""
     # take the mean p values and make a latex table out of it
     df_latex = "\centering\n"
     df_latex += df.to_latex(header=True, float_format=f"%.{precision}f", index=True)
@@ -190,7 +191,7 @@ def make_mean_table(df, folder_save, test_name, col_name, caption, label, precis
     return df_latex
 
 def make_pvalues_table(df, folder_save, test_name, col_name, caption, label, precision=6, save=True):
-    # take the mean p values and make a latex table out of it
+    """takes all the pvalues in a dataframe and makes a latex table out of it."""
     df_latex = "\centering\n"
     df_latex += df.to_latex(header=True, float_format=f"%.{precision}f", index=True)
     df_latex = df_latex.replace('-1.' + '0' * precision, '-')
@@ -203,6 +204,7 @@ def make_pvalues_table(df, folder_save, test_name, col_name, caption, label, pre
     return df_latex
 
 def make_pvalues_df(pvalues, pmean_values, folders, alpha):
+    """takes the pvalues and makes a dataframe. the dataframe is designed to be converted into a latex table."""
     df_pvalues = pd.DataFrame()
     # for every entry of pvalues, make a new column in the dataframe
     for i in range(0, len(pvalues)):
@@ -224,12 +226,14 @@ def make_pvalues_df(pvalues, pmean_values, folders, alpha):
     return df_pvalues
 
 def col_names_from_folders(folders):
+    """derives column names from the folder names."""
     column_names = []
     for name in folders:
         column_names.append(name.split('/')[-1].split('_',1)[1].replace('_','\_'))
     return column_names
 
 def make_tables_from_experiment(folder_save, test_name, col_name, folders, alpha, precision=6, print_every=True):
+    """takes a several experiments in their folders, performs a hypothesis test on them and makes a latex table."""
     caption = f"mean p values over 20 experiments for the {test_name} test on {col_name}"
     label = f"tab:mean_pvalues_{test_name}_{col_name}"
     column_names = col_names_from_folders(folders)
