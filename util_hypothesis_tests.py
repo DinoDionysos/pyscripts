@@ -25,11 +25,11 @@ def mannwhitneyu_print(data_1, data_2, alpha, print_res=True):
     #
     stat_x, p = mannwhitneyu(data_1, data_2, alternative ='two-sided')
     if print_res == True:
-        print('mwu stat 1 = %.1f, p=%.15f' % (stat_x, p), end='')
+        print('mwu stat 1 = %.1f, p=%.6f' % (stat_x, p), end='')
         if p > alpha:
             print('Same distribution (fail to reject H0) pvalue=%d' % p)
         else:
-            print('Different distribution (reject H0) pvalue=%.15f' % p)
+            print('Different distribution (reject H0) pvalue=%.6f' % p)
     return stat_x, p
 
 def mannwhitneyu_n(dist_list_1, dist_list_2, alpha, print_every=True):
@@ -55,7 +55,7 @@ def mannwhitneyu_n(dist_list_1, dist_list_2, alpha, print_every=True):
         stat, p = mannwhitneyu_print(dist_list_1[i], dist_list_2[i], alpha, print_every)
         pvalues_mwu_test.append(p) 
     pmean_mwu_test = np.mean(pvalues_mwu_test)
-    print('mean pvalue = %.15f ' % pmean_mwu_test)
+    print('mean pvalue = %.6f ' % pmean_mwu_test)
     return pmean_mwu_test, pvalues_mwu_test
 
 def kolmogorov_print(data_1, data_2, alpha, print_res=True):
@@ -76,11 +76,11 @@ def kolmogorov_print(data_1, data_2, alpha, print_res=True):
     #
     stat, p = ks_2samp(data_1, data_2)
     if print_res == True:
-        print('ks stat 1 = %.1f, p=%.15f' % (stat, p), end='')
+        print('ks stat 1 = %.1f, p=%.6f' % (stat, p), end='')
         if p > alpha:
             print('Same distribution (fail to reject H0) pvalue=%d' % p)
         else:
-            print('Different distribution (reject H0) pvalue=%.15f' % p)
+            print('Different distribution (reject H0) pvalue=%.6f' % p)
     return stat, p
 
 def kolmogorov_n(dist_list_1, dist_list_2, alpha, print_every=True):
@@ -106,7 +106,7 @@ def kolmogorov_n(dist_list_1, dist_list_2, alpha, print_every=True):
         stat, p = kolmogorov_print(dist_list_1[i], dist_list_2[i], alpha, print_every)
         pvalues_mwu_test.append(p) 
     pmean_mwu_test = np.mean(pvalues_mwu_test)
-    print('mean pvalue = %.15f ' % pmean_mwu_test)
+    print('mean pvalue = %.6f ' % pmean_mwu_test)
     return pmean_mwu_test, pvalues_mwu_test
 
 def read_csv_from_folder(folder):
