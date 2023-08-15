@@ -9,3 +9,4 @@ __pycache__/*
 !bags/record_orb.sh
 !bags/sim_record.sh
 !bags/split_bag.sh
+!bags/play_cX.py
