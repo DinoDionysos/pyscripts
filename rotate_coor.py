@@ -42,41 +42,62 @@ else:
     data_y = df_data['y'].to_numpy()
 data_z = np.zeros(len(data_x))
 mapping_points = np.array([data_x, data_y, data_z])
-
+# make A the first two columns of true_points and B the first two columns of mapping_points
 true_points = true_points.T
 mapping_points = mapping_points.T
+A = true_points[:,0:2]
+B = mapping_points[:,0:2]
 # kabsch algorithm from https://stackoverflow.com/questions/60877274/optimal-rotation-in-3d-with-kabsch-algorithm
 # as far as I understand it resembles the horn method implementations that I have seen like ein horn_demo.py. The difference seems laut wikipedia that horn is in qaternion and kabsch is in rotation matrix.
 #For an alternative kabsch implementation see here https://zpl.fi/aligning-point-patterns-with-kabsch-umeyama-algorithm/
-mapped_centroid = np.average(mapping_points, axis=0)
-true_centroid = np.average(true_points, axis=0)
-mapping_points -= mapped_centroid
-true_points -= true_centroid
-h = mapping_points.T @ true_points
-u, s, vt = np.linalg.svd(h)
-v = vt.T
-d = np.linalg.det(v @ u.T)
-# get the sign of d
-# solution from stackoverflow does not implement the sign here? wikipedia says it should be and the horn_demo.py also does it.
-# https://en.wikipedia.org/wiki/Kabsch_algorithm
-d = np.sign(d) 
-e = np.array([[1, 0, 0], [0, 1, 0], [0, 0, d]])
-r = v @ e @ u.T
-tt = true_centroid - np.matmul(r, mapped_centroid)
-true_points += true_centroid
-mapping_points += mapped_centroid
+# mapped_centroid = np.average(mapping_points, axis=0)
+# true_centroid = np.average(true_points, axis=0)
+# mapping_points -= mapped_centroid
+# true_points -= true_centroid
+# h = mapping_points.T @ true_points
+# u, s, vt = np.linalg.svd(h)
+# v = vt.T
+# d = np.linalg.det(v @ u.T)
+# # get the sign of d
+# # solution from stackoverflow does not implement the sign here? wikipedia says it should be and the horn_demo.py also does it.
+# # https://en.wikipedia.org/wiki/Kabsch_algorithm
+# d = np.sign(d) 
+# e = np.array([[1, 0, 0], [0, 1, 0], [0, 0, d]])
+# r = v @ e @ u.T
+# tt = true_centroid - np.matmul(r, mapped_centroid)
+# true_points += true_centroid
+# mapping_points += mapped_centroid
 
 #mapping
-map_list = []
-for i in mapping_points:
-    point = np.matmul(r, i) + tt
-    map_list.append(np.reshape(point, (1, 3)))
-mapped_xyz = np.vstack(map_list)
-
-# normalize such that the first point is 0,0
+# map_list = []
+# for i in mapping_points:
+#     point = np.matmul(r, i) + tt
+#     map_list.append(np.reshape(point, (1, 3)))
+# mapped_xyz = np.vstack(map_list)
+# # normalize such that the first point is 0,0
 # true_points -= true_points[0]
 # mapping_points -= mapping_points[0]
 # mapped_xyz -= mapped_xyz[0]
+
+n, m = A.shape
+
+EA = np.mean(A, axis=0)
+EB = np.mean(B, axis=0)
+VarA = np.mean(np.linalg.norm(A - EA, axis=1) ** 2)
+
+H = ((A - EA).T @ (B - EB)) / n
+U, D, VT = np.linalg.svd(H)
+d = np.sign(np.linalg.det(U) * np.linalg.det(VT))
+S = np.diag([1] * (m - 1) + [d])
+
+R = U @ S @ VT
+c = VarA / np.trace(np.diag(D) @ S)
+t = EA - c * R @ EB
+
+B_ = B = np.array([t + c * R @ b for b in B])
+mapped_xyz = mapping_points
+mapped_xyz[:,0:2] = B_
+true_points[:,0:2] = A
 
 euclidean_distance = np.linalg.norm(mapped_xyz - true_points, axis=1)
 euclidean_distance_diff = np.diff(euclidean_distance)
