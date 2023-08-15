@@ -1,4 +1,5 @@
 #!/bin/bash
+# Call it from pyscripts/bags folder because of the relative paths
 # $1: folder name where the folder $2 is inside (f.e. orb)
 # $2: prefix and folder name of the bagfile to record (c7_orb_d435)
 # $3: postfix of the roslaunch file
