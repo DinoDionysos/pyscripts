@@ -109,10 +109,12 @@ if not os.path.exists('csv/aligned/' + folder_name):
 df_data.to_csv(csv_file, index=False)
 print('saved csv to: ' + csv_file)
 
-if show_plot_time != 0:
+if show_plot_time > 0:
     plt.show(block=False)
     plt.pause(show_plot_time)
     plt.close(fig)
+elif show_plot_time == 0:
+    plt.show()
 
 
 

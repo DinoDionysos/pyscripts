@@ -19,6 +19,6 @@ do
     python3 rotate_coor.py \
     csv/$folder/$file_prefix"_"$i-gt.csv \
     csv/$folder/$file_prefix"_"$i-orb.csv \
-    1 # how long to show the plot
+    0 # how long to show the plot
 done
 
