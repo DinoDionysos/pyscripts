@@ -11,7 +11,7 @@ for file in files:
 # print the command
 print(command)
 # pause for 5 seconds
-os.system("sleep 10")
+os.system("sleep 5")
 
 # execute the command
 os.system(command)
