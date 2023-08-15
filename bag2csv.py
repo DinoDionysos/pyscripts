@@ -92,6 +92,8 @@ if (topic_type == "nav_msgs/Odometry"):
     # remove the "position." from the column names
     df.columns = df.columns.str.replace('position.', '')
     # remove the "header." from the column names
+    df.columns = df.columns.str.replace('%', '')
+    # remove the "header." from the column names
     df.columns = df.columns.str.replace('header.', '')
 
 elif (topic_type == "geometry_msgs/PoseStamped"):
@@ -108,6 +110,8 @@ elif (topic_type == "geometry_msgs/PoseStamped"):
     # remove the "position." from the column names
     df.columns = df.columns.str.replace('position.', '')
     # remove the "header." from the column names
+    df.columns = df.columns.str.replace('%', '')
+    # remove the "header." from the column names
     df.columns = df.columns.str.replace('header.', '')
 
 # normalize the timestamp column
@@ -115,7 +119,7 @@ df['stamp'] = df['stamp'] - df['stamp'][0]
 # normalize the seq column
 df['seq'] = df['seq'] - df['seq'][0]
 # normalize the %time column
-df['%time'] = df['%time'] - df['%time'][0]
+df['time'] = df['time'] - df['time'][0]
 # normalize the x column
 df['x'] = df['x'] - df['x'][0]
 # normalize the y column

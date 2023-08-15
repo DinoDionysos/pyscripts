@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+show_plot_time = int(sys.argv[3])
+
 plt.style.use('dark_background')
 plt.rcParams.update({
     "axes.facecolor": (0.3,0.3,0.3),
@@ -17,8 +19,8 @@ folder_name = sys.argv[1].split('/')[2]
 df_gt = pd.read_csv(sys.argv[1])
 df_data = pd.read_csv(sys.argv[2])
 
-df_data_timestamp = df_data['stamp']
-df_gt_timestamp = df_gt['stamp']
+df_data_timestamp = df_data['time']
+df_gt_timestamp = df_gt['time']
 df_data_timestamp = df_data_timestamp - df_data_timestamp[0]
 df_gt_timestamp = df_gt_timestamp - df_gt_timestamp[0]
 df_data_timestamp = df_data_timestamp.to_numpy()
@@ -81,7 +83,7 @@ euclidean_distance_diff = np.diff(euclidean_distance)
 euclidean_distance_diff = np.insert(euclidean_distance_diff, 0, 0)
 euclidean_distance_diff = euclidean_distance_diff * 1000
 euclidean_distance = euclidean_distance * 1000
-df_data = pd.DataFrame({'stamp': df_data_timestamp, 'x': mapped_xyz[:,0], 'y': mapped_xyz[:,1], 'x_gt': true_points[:,0], 'y_gt': true_points[:,1], 'dist': euclidean_distance, 'ffd': euclidean_distance_diff})
+df_data = pd.DataFrame({'stamp': df_data_timestamp, 'x': mapped_xyz[:,0], 'y': mapped_xyz[:,1], 'x_gt': true_points[:,0], 'y_gt': true_points[:,1], 'ape': euclidean_distance, 'rpe': euclidean_distance_diff})
 
 fig = plt.figure()
 plt.axis('equal')
@@ -107,9 +109,10 @@ if not os.path.exists('csv/aligned/' + folder_name):
 df_data.to_csv(csv_file, index=False)
 print('saved csv to: ' + csv_file)
 
-plt.show(block=False)
-plt.pause(5)
-plt.close(fig)
+if show_plot_time != 0:
+    plt.show(block=False)
+    plt.pause(show_plot_time)
+    plt.close(fig)
 
 
 
