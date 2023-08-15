@@ -5,3 +5,7 @@ copy_figures.py
 .vscode/*
 horn_demo.py
 __pycache__/*
+!bags/n_record_slam.sh
+!bags/record_orb.sh
+!bags/sim_record.sh
+!bags/split_bag.sh
