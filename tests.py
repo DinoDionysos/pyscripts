@@ -47,7 +47,7 @@ for error_type in ["ape", "rpe"]:
                 new_col_name = folder_names[i] + " vs " + folder_names[j]
                 latex_string_diff = latex_string_diff.replace(new_col_name, "\multicolumn{1}{p{2cm}}{\centering %s \\\\  vs  \\\\ %s}" % (folder_names[i], folder_names[j]))
         # line over reject and fail
-        latex_string_diff = latex_string_diff.replace('\nrejected &', '\n\midrule\nrejected &')
+        latex_string_diff = latex_string_diff.replace('\nreject &', '\n\midrule\nreject &')
         # caption
         latex_string_diff += "\caption{Each column shows the comparison of two \\ac{slam} approaches with %d p-values from \\ac{%s} tests on \\ac{%s} data.}\n" % (num_of_tests_per_slam_combi, test_names[test_idx], error_type)
         # label
@@ -90,7 +90,7 @@ for error_type in ["ape", "rpe"]:
         # caption
         latex_string_self += "\caption{Each column shows the comparison of a \\ac{slam} approach with itself with %d p-values from \\ac{%s} tests on \\ac{%s} data.}\n" % (num_of_tests_per_slam, test_names[test_idx], error_type)
         # label
-        latex_string_self += "\label{tab:%s_%s}\n" % (error_type, test_names[test_idx])
+        latex_string_self += "\label{tab:%s_%s_self}\n" % (error_type, test_names[test_idx])
 
         # write latex table
         with open(folder_save + error_type + "_" + test_names[test_idx] + "_self.tex", "w") as f:
