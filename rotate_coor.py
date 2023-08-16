@@ -14,17 +14,24 @@ plt.rcParams.update({
 
 pos_fig_x = 1200
 pos_fig_y = 100
-folder_name = sys.argv[1].split('/')[2]
+folder_name = sys.argv[1].split('/')[2] # f.e. c8_orb_mono
 
 df_gt = pd.read_csv(sys.argv[1])
 df_data = pd.read_csv(sys.argv[2])
 
-df_data_timestamp = df_data['time']
-df_gt_timestamp = df_gt['time']
-df_data_timestamp = df_data_timestamp - df_data_timestamp[0]
-df_gt_timestamp = df_gt_timestamp - df_gt_timestamp[0]
-df_data_timestamp = df_data_timestamp.to_numpy()
-df_gt_timestamp = df_gt_timestamp.to_numpy()
+df_data_timestamp = df_data['stamp'].to_numpy()
+df_gt_timestamp = df_gt['stamp'].to_numpy()
+df_data_time = df_data['time'].to_numpy()
+df_gt_time = df_gt['time'].to_numpy()
+# do not normalize the time before interpolation!
+df_gt['seq'] = df_gt['seq'] - df_gt['seq'][0]
+df_gt['x'] = df_gt['x'] - df_gt['x'][0]
+df_gt['y'] = df_gt['y'] - df_gt['y'][0]
+df_gt['z'] = df_gt['z'] - df_gt['z'][0]
+df_data['seq'] = df_data['seq'] - df_data['seq'][0]
+df_data['x'] = df_data['x'] - df_data['x'][0]
+df_data['y'] = df_data['y'] - df_data['y'][0]
+df_data['z'] = df_data['z'] - df_data['z'][0]
 
 # prepare true_points and mapping_points arrays for kabsch algorithm
 gt_x = df_gt['x'].to_numpy()

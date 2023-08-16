@@ -88,19 +88,5 @@ elif (topic_type == "geometry_msgs/PoseStamped"):
     df.columns = df.columns.str.replace('%', '')
     df.columns = df.columns.str.replace('header.', '')
 
-# normalize the timestamp column
-df['stamp'] = df['stamp'] - df['stamp'][0]
-# normalize the seq column
-df['seq'] = df['seq'] - df['seq'][0]
-# normalize the %time column
-df['time'] = df['time'] - df['time'][0]
-# normalize the x column
-df['x'] = df['x'] - df['x'][0]
-# normalize the y column
-df['y'] = df['y'] - df['y'][0]
-# normalize the z column
-df['z'] = df['z'] - df['z'][0]
-
-# save csv as csv_file
 df.to_csv(csv_file, index=False)
 # print("[INFO] "+file_name+" | saved to: " + csv_file)
