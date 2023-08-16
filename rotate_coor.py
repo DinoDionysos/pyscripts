@@ -38,75 +38,39 @@ gt_x = df_gt['x'].to_numpy()
 gt_y = df_gt['y'].to_numpy()
 gt_x = np.interp(df_data_timestamp, df_gt_timestamp, gt_x)
 gt_y = np.interp(df_data_timestamp, df_gt_timestamp, gt_y)
-gt_z = np.zeros(len(gt_x))
-true_points = np.array([gt_x, gt_y, gt_z])
+true_points = np.array([gt_x, gt_y])
 
 data_x = df_data['x'].to_numpy()
-# if sys.arg[2] contains orb and d435 and not imu then get the z axis instead of the y axis
 if 'orb' in sys.argv[2] and 'd435' in sys.argv[2] and 'imu' not in sys.argv[2]:
     data_y = df_data['z'].to_numpy()
 else:
     data_y = df_data['y'].to_numpy()
-data_z = np.zeros(len(data_x))
-mapping_points = np.array([data_x, data_y, data_z])
-# make A the first two columns of true_points and B the first two columns of mapping_points
+mapping_points = np.array([data_x, data_y])
 true_points = true_points.T
 mapping_points = mapping_points.T
-A = true_points[:,0:2]
-B = mapping_points[:,0:2]
-# kabsch algorithm from https://stackoverflow.com/questions/60877274/optimal-rotation-in-3d-with-kabsch-algorithm
-# as far as I understand it resembles the horn method implementations that I have seen like ein horn_demo.py. The difference seems laut wikipedia that horn is in qaternion and kabsch is in rotation matrix.
-#For an alternative kabsch implementation see here https://zpl.fi/aligning-point-patterns-with-kabsch-umeyama-algorithm/
-# mapped_centroid = np.average(mapping_points, axis=0)
-# true_centroid = np.average(true_points, axis=0)
-# mapping_points -= mapped_centroid
-# true_points -= true_centroid
-# h = mapping_points.T @ true_points
-# u, s, vt = np.linalg.svd(h)
-# v = vt.T
-# d = np.linalg.det(v @ u.T)
-# # get the sign of d
-# # solution from stackoverflow does not implement the sign here? wikipedia says it should be and the horn_demo.py also does it.
-# # https://en.wikipedia.org/wiki/Kabsch_algorithm
-# d = np.sign(d) 
-# e = np.array([[1, 0, 0], [0, 1, 0], [0, 0, d]])
-# r = v @ e @ u.T
-# tt = true_centroid - np.matmul(r, mapped_centroid)
-# true_points += true_centroid
-# mapping_points += mapped_centroid
 
-#mapping
-# map_list = []
-# for i in mapping_points:
-#     point = np.matmul(r, i) + tt
-#     map_list.append(np.reshape(point, (1, 3)))
-# mapped_xyz = np.vstack(map_list)
-# # normalize such that the first point is 0,0
-# true_points -= true_points[0]
-# mapping_points -= mapping_points[0]
-# mapped_xyz -= mapped_xyz[0]
-
+# source:https://zpl.fi/aligning-point-patterns-with-kabsch-umeyama-algorithm/
+A = true_points
+B = mapping_points
 n, m = A.shape
-
 EA = np.mean(A, axis=0)
 EB = np.mean(B, axis=0)
 VarA = np.mean(np.linalg.norm(A - EA, axis=1) ** 2)
-
 H = ((A - EA).T @ (B - EB)) / n
 U, D, VT = np.linalg.svd(H)
 d = np.sign(np.linalg.det(U) * np.linalg.det(VT))
 S = np.diag([1] * (m - 1) + [d])
-
 R = U @ S @ VT
 c = VarA / np.trace(np.diag(D) @ S)
 t = EA - c * R @ EB
+if('mono' in folder_name.split('_')):
+    B = np.array([t + c * R @ b for b in B])
+else:
+    B = np.array([t + R @ b for b in B])
+mapped_xy = B
+true_points = A
 
-B_ = B = np.array([t + c * R @ b for b in B])
-mapped_xyz = mapping_points
-mapped_xyz[:,0:2] = B_
-true_points[:,0:2] = A
-
-euclidean_distance = np.linalg.norm(mapped_xyz - true_points, axis=1)
+euclidean_distance = np.linalg.norm(mapped_xy - true_points, axis=1)
 euclidean_distance_diff = np.diff(euclidean_distance)
 euclidean_distance_diff = np.insert(euclidean_distance_diff, 0, 0)
 euclidean_distance_diff = euclidean_distance_diff * 1000
@@ -117,9 +81,9 @@ fig = plt.figure()
 plt.axis('equal')
 plt.title(sys.argv[1].split('/')[-1] + ' vs ' + sys.argv[2].split('/')[1])
 for i in range(len(true_points)):
-    plt.plot([true_points[i,0], mapped_xyz[i,0]], [true_points[i,1], mapped_xyz[i,1]], color='gray')
+    plt.plot([true_points[i,0], mapped_xy[i,0]], [true_points[i,1], mapped_xy[i,1]], color='gray')
 plt.plot(true_points[:,0], true_points[:,1], marker='o', markeredgecolor='black', label='true')
-plt.plot(mapped_xyz[:,0], mapped_xyz[:,1], marker='o', markeredgecolor='black', label='mapped')
+plt.plot(mapped_xy[:,0], mapped_xy[:,1], marker='o', markeredgecolor='black', label='mapped')
 plt.legend()
 mngr = plt.get_current_fig_manager()
 geom = mngr.window.geometry()
@@ -143,8 +107,4 @@ if show_plot_time > 0:
     plt.close(fig)
 elif show_plot_time == 0:
     plt.show()
-
-
-
-
 
