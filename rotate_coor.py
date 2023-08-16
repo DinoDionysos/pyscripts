@@ -75,7 +75,11 @@ euclidean_distance_diff = np.diff(euclidean_distance)
 euclidean_distance_diff = np.insert(euclidean_distance_diff, 0, 0)
 euclidean_distance_diff = euclidean_distance_diff * 1000
 euclidean_distance = euclidean_distance * 1000
-df_data = pd.DataFrame({'stamp': df_data_timestamp, 'x': mapped_xyz[:,0], 'y': mapped_xyz[:,1], 'x_gt': true_points[:,0], 'y_gt': true_points[:,1], 'ape': euclidean_distance, 'rpe': euclidean_distance_diff})
+
+df_data_time = df_data_time - df_data_time[0]
+df_data_timestamp = df_data_timestamp - df_data_timestamp[0]
+
+df_data = pd.DataFrame({'time': df_data_time, 'stamp': df_data_timestamp, 'x': mapped_xy[:,0], 'y': mapped_xy[:,1], 'x_gt': true_points[:,0], 'y_gt': true_points[:,1], 'ape': euclidean_distance, 'rpe': euclidean_distance_diff})
 
 fig = plt.figure()
 plt.axis('equal')
