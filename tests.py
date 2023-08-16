@@ -10,7 +10,8 @@ from util_hypothesis_tests_2 import *
 folders = ["csv/aligned/c8_orb_stereo", "csv/aligned/c8_orb_d435", "csv/aligned/c8_orb_mono"]
 columns_ape = [read_cols_from_folder(folder, "ape") for folder in folders]
 columns_rpe = [read_cols_from_folder(folder, "rpe") for folder in folders]
-folder_names = folder_names_from_folder_paths(folders)
+# folder_names = folder_names_from_folder_paths(folders)
+folder_names = ['stereo', 'RGBD', 'mono']
 folder_save = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/results/"
 alpha = 0.05
 print_every = False
