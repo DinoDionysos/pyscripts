@@ -11,14 +11,11 @@ if len(sys.argv) > 4 or len(sys.argv) < 3:
     print("[INFO] "+file_name+" | Usage: python3 "+file_name+" <bag_name> <topic_name> optional:<topic_type> \nThe file <bag_name> should be placed in the bags folder respectively. \nIt is not necessary to have 'bags/' in the beginning of the <bag_name>.\n <topic_type> is optional and can be found by executing: 'rosbag info <bag_name> -y -k topics'\n <topic_name> has a '/' in the beginning.")
     sys.exit(1)
 
-# read the first input from command line
 bag_name = sys.argv[1]
-# if bag_name starts with bags/, remove it
 if bag_name.startswith('bags/'):
     bag_name = bag_name.replace('bags/', '')
 
 folder_name = bag_name.split('/')[0] +'/'+bag_name.split('/')[1]
-# print("[INFO] "+file_name+" | folder_name: " + folder_name)
 
 topic_name = sys.argv[2]
 topic_name_str = topic_name
@@ -30,10 +27,7 @@ elif topic_name == 'orb':
 if len(sys.argv) == 4:
     topic_type = sys.argv[3]
 else:
-    # excecute the command: "rosbag info test_orbmono_vs_gt.bag -y -k topics" and read the output into a variable
     output = os.popen('rosbag info bags/'+bag_name+' -y -k topics').read()
-    # print(output)
-
     # split the output. an entry begins with '-'
     output = output.split('-')
     # remove the first entry because it is empty
@@ -57,61 +51,40 @@ else:
 
 # make csv_file the combination of first and second
 csv_file = bag_name.split('/')[2].split('.')[0] + '-' + topic_name_str
-# add .csv to the end of csv_file and place it in the csv folder
 csv_file = "csv/" + folder_name +'/'+ csv_file + '.csv'
 
-# if folder does not exist, create it
 if not os.path.exists("csv/" + folder_name):
     os.makedirs("csv/" + folder_name)
-    #print
     print("[INFO] "+file_name+" | created folder: " + "csv/" + folder_name)
 
 command = 'rostopic echo -b bags/'+bag_name+' -p '+topic_name+' > '+csv_file
 os.system(command)
-# print the command
 print("[INFO] "+file_name+" | executing: " + command)
 
-# load csv/test_orbmono_vs_gt-ground_truthodom.csv from /csv as dataframe
 df = pd.read_csv(csv_file)
-# print("[INFO] "+file_name+" | loaded: " + csv_file)
-
-
 
 # define function to replace the following part
 if (topic_type == "nav_msgs/Odometry"):
-    # drop the all columns with twist in the name
     df = df[df.columns.drop(list(df.filter(regex='twist')))]
-    # drop all the columns with covariance in the name
     df = df[df.columns.drop(list(df.filter(regex='covariance')))]
-    # drop all the columns with orientation in the name
     df = df[df.columns.drop(list(df.filter(regex='orientation')))]
     # remove the "field." from the column names
     df.columns = df.columns.str.replace('field.', '')
-    # remove the "pose." from the column names
     df.columns = df.columns.str.replace('pose.', '')
-    # remove the "position." from the column names
     df.columns = df.columns.str.replace('position.', '')
-    # remove the "header." from the column names
     df.columns = df.columns.str.replace('%', '')
-    # remove the "header." from the column names
     df.columns = df.columns.str.replace('header.', '')
 
 elif (topic_type == "geometry_msgs/PoseStamped"):
     # drop the all columns with twist in the name
     df = df[df.columns.drop(list(df.filter(regex='twist')))]
-    # drop all the columns with covariance in the name
     df = df[df.columns.drop(list(df.filter(regex='covariance')))]
-    # drop all the columns with orientation in the name
     df = df[df.columns.drop(list(df.filter(regex='orientation')))]
     # remove the "field." from the column names
     df.columns = df.columns.str.replace('field.', '')
-    # remove the "pose." from the column names
     df.columns = df.columns.str.replace('pose.', '')
-    # remove the "position." from the column names
     df.columns = df.columns.str.replace('position.', '')
-    # remove the "header." from the column names
     df.columns = df.columns.str.replace('%', '')
-    # remove the "header." from the column names
     df.columns = df.columns.str.replace('header.', '')
 
 # normalize the timestamp column
