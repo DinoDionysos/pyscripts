@@ -68,7 +68,7 @@ if (topic_type == "nav_msgs/Odometry"):
     df = df[df.columns.drop(list(df.filter(regex='twist')))]
     df = df[df.columns.drop(list(df.filter(regex='covariance')))]
     df = df[df.columns.drop(list(df.filter(regex='orientation')))]
-    # remove the "field." from the column names
+    df = df[df.columns.drop(list(df.filter(regex='frame_id')))]
     df.columns = df.columns.str.replace('field.', '')
     df.columns = df.columns.str.replace('pose.', '')
     df.columns = df.columns.str.replace('position.', '')
@@ -80,6 +80,7 @@ elif (topic_type == "geometry_msgs/PoseStamped"):
     df = df[df.columns.drop(list(df.filter(regex='twist')))]
     df = df[df.columns.drop(list(df.filter(regex='covariance')))]
     df = df[df.columns.drop(list(df.filter(regex='orientation')))]
+    df = df[df.columns.drop(list(df.filter(regex='frame_id')))]
     # remove the "field." from the column names
     df.columns = df.columns.str.replace('field.', '')
     df.columns = df.columns.str.replace('pose.', '')
