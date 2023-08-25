@@ -8,9 +8,12 @@ from util_hypothesis_tests_2 import read_cols_from_folder
 from util_latex_tables import *
 from util_error_measures import *
 
+# for changing to another simulation scenario the following variables need to be changed:
+scenario = "c8"
 
-
-folders = ["csv/aligned/c8_orb_stereo", "csv/aligned/c8_orb_d435", "csv/aligned/c8_orb_mono"]
+folders = ["csv/aligned/"+scenario+"_orb_stereo",\
+            "csv/aligned/"+scenario+"_orb_d435",\
+            "csv/aligned/"+scenario+"_orb_mono"]
 list_slam_repet_trajec_ape = [read_cols_from_folder(folder, "ape") for folder in folders] 
 # list of length #folders of lists of length N with array with #(poses in traj) ape elements
 # N ape arrays pro SLAM
@@ -71,9 +74,14 @@ print(latex_rpe)
 
 
 
+#hierarchy of the datastructures:
+# level 1: slam
+# level 2: repetition of trajectory on same rosbag
+# level 3: poses in the trajectory
 
-
-
+# make 4 tables to another
+# every table has every slam combination
+# with 20 hypothesis tests
 
 for error_type in ["ape", "rpe"]:
     if error_type == "ape":
@@ -99,6 +107,7 @@ for error_type in ["ape", "rpe"]:
         ## end make dataframe and caluclations #################################
 
         # maybe the dataframes need to be split up here vertically if two many combinations are tested. just index the latex tables then with 1,2,3,...
+
         postfix = "to_another"
         caption = "\caption{Each column shows the comparison of two \\ac{slam} approaches with %d p-values from \\ac{%s} tests on \\ac{%s} data.}\n" % (num_of_tests_per_slam_combi, test_names[test_idx], error_type)
         label = "\label{tab:%s_%s_%s}\n" % (test_names[test_idx], error_type, postfix)
