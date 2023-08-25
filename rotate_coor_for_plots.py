@@ -11,6 +11,32 @@ show_plot_time = int(sys.argv[3])
 #     "axes.facecolor": (0.3,0.3,0.3),
 #     "figure.facecolor": (0.1,0.1,0.1),
 #     "grid.color": (0.3,0.3,0.3)}),
+fontsize=14
+marker_size=10
+linewidth=2
+def plot_alignment(trajectroy_true, trajectory_mapped, label1, label2, title, xlabel, ylabel, markeredgecolor, marker, color_error, linewidth=linewidth, marker_size=marker_size, fontsize=fontsize):
+    fig = plt.figure()
+    plt.axis('equal')
+    # plt.title(title, fontsize=fontsize)
+    for i in range(len(trajectroy_true)):
+        plt.plot([trajectroy_true[i,0], trajectory_mapped[i,0]], [trajectroy_true[i,1], trajectory_mapped[i,1]], color=color_error, linewidth=linewidth)
+
+    plt.plot(trajectroy_true[:,0], trajectroy_true[:,1], marker=marker, markeredgecolor=markeredgecolor, label=label1, linewidth=linewidth, markersize=marker_size)
+
+    plt.plot(trajectory_mapped[:,0], trajectory_mapped[:,1], marker=marker, markeredgecolor=markeredgecolor, label=label2, linewidth=linewidth, markersize=marker_size)
+
+    plt.plot([trajectroy_true[0,0], trajectory_mapped[0,0]], [trajectroy_true[0,1], trajectory_mapped[0,1]], color=color_error, label ="errors") # for label in legend
+    plt.xlabel(xlabel, fontsize=fontsize)
+    plt.ylabel(ylabel, fontsize=fontsize)
+    plt.xticks(fontsize=fontsize)
+    plt.yticks(fontsize=fontsize)
+    #make lengend with location upper left and make bigger font
+    plt.legend(loc=2, prop={'size': fontsize})
+    mngr = plt.get_current_fig_manager()
+    geom = mngr.window.geometry()
+    x,y,dx,dy = geom.getRect()
+    mngr.window.setGeometry(pos_fig_x, pos_fig_y, dx, dy)
+    return fig
 
 pos_fig_x = 1200
 pos_fig_y = 100
@@ -65,12 +91,12 @@ R = U @ S @ VT
 c = VarA / np.trace(np.diag(D) @ S)
 t = EA - c * R @ EB
 if('mono' in folder_name.split('_')):
-    B = np.array([ 5*b for b in mapping_points]) # t + c * R @ # np.array([2,-2])
+    B = np.array([np.array([2,-2]) + c*b for b in mapping_points]) # t + c * R @ # np.array([2,-2])
 else:
     B = np.array([t + c * R @ b for b in mapping_points])
 mapped_xy = B
 # true_points = A
-plot_title = 'raw data'
+
 
 
 
@@ -87,6 +113,7 @@ df_data = pd.DataFrame({'time': df_data_time, 'stamp': df_data_timestamp, 'x': m
 
 # plot_title = sys.argv[1].split('/')[-1] + ' vs ' + sys.argv[2].split('/')[1]
 
+
 color_error = 'gray'
 label1 = 'ground truth'
 label2 = 'vSLAM'
@@ -94,39 +121,37 @@ markeredgecolor = 'black'
 marker = 'o'
 xlabel = 'x [m]'
 ylabel = 'y [m]'
-fontsize=14
-marker_size=10
-linewidth=2
-def plot_alignment(trajectroy_true, trajectory_mapped, label1, label2, title, xlabel, ylabel, markeredgecolor, marker, color_error, linewidth=linewidth, marker_size=marker_size, fontsize=fontsize):
-    fig = plt.figure()
-    plt.axis('equal')
-    plt.title(title, fontsize=fontsize)
-    for i in range(len(trajectroy_true)):
-        plt.plot([trajectroy_true[i,0], trajectory_mapped[i,0]], [trajectroy_true[i,1], trajectory_mapped[i,1]], color=color_error, linewidth=linewidth)
-
-    plt.plot(trajectroy_true[:,0], trajectroy_true[:,1], marker=marker, markeredgecolor=markeredgecolor, label=label1, linewidth=linewidth, markersize=marker_size)
-
-    plt.plot(trajectory_mapped[:,0], trajectory_mapped[:,1], marker=marker, markeredgecolor=markeredgecolor, label=label2, linewidth=linewidth, markersize=marker_size)
-
-    plt.plot([trajectroy_true[0,0], trajectory_mapped[0,0]], [trajectroy_true[0,1], trajectory_mapped[0,1]], color=color_error, label ="errors") # for label in legend
-    plt.xlabel(xlabel, fontsize=fontsize)
-    plt.ylabel(ylabel, fontsize=fontsize)
-    plt.xticks(fontsize=fontsize)
-    plt.yticks(fontsize=fontsize)
-    #make lengend with location upper left and make bigger font
-    plt.legend(loc=2, prop={'size': fontsize})
-    mngr = plt.get_current_fig_manager()
-    geom = mngr.window.geometry()
-    x,y,dx,dy = geom.getRect()
-    mngr.window.setGeometry(pos_fig_x, pos_fig_y, dx, dy)
-    return fig
-
 every_nth_point = 20
-fig = plot_alignment(true_points[::every_nth_point], mapped_xy[::every_nth_point], label1, label2, plot_title, xlabel, ylabel, markeredgecolor, marker, color_error)
-
-#save plot to file as pdf and call it "alignment_" + title + ".pdf"
 folder_save = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/img/"
+
+fake_translation = np.array([2,-2])
+fake_scale = 5
+
+plot_title = 'raw_2'
+mapped_xy = np.array([ fake_translation + fake_scale*b for b in mapping_points])
+fig = plot_alignment(true_points[::every_nth_point], mapped_xy[::every_nth_point], label1, label2, plot_title, xlabel, ylabel, markeredgecolor, marker, color_error)
 plt.savefig(os.path.join(folder_save, 'alignment_' + plot_title + '.pdf'), bbox_inches='tight')
+plt.show()
+
+plot_title = 'rotated_2'
+mapped_xy = np.array([ fake_translation + fake_scale*R@b for b in mapping_points])
+fig = plot_alignment(true_points[::every_nth_point], mapped_xy[::every_nth_point], label1, label2, plot_title, xlabel, ylabel, markeredgecolor, marker, color_error)
+plt.savefig(os.path.join(folder_save, 'alignment_' + plot_title + '.pdf'), bbox_inches='tight')
+plt.show()
+
+plot_title = 'scaled_2'
+mapped_xy = np.array([ fake_translation + c*R@b for b in mapping_points])
+fig = plot_alignment(true_points[::every_nth_point], mapped_xy[::every_nth_point], label1, label2, plot_title, xlabel, ylabel, markeredgecolor, marker, color_error)
+plt.savefig(os.path.join(folder_save, 'alignment_' + plot_title + '.pdf'), bbox_inches='tight')
+plt.show()
+
+
+
+plot_title = 'translated_2'
+mapped_xy = np.array([ t + c*R@b for b in mapping_points])
+fig = plot_alignment(true_points[::every_nth_point], mapped_xy[::every_nth_point], label1, label2, plot_title, xlabel, ylabel, markeredgecolor, marker, color_error)
+plt.savefig(os.path.join(folder_save, 'alignment_' + plot_title + '.pdf'), bbox_inches='tight')
+plt.show()
 
 # fig = plt.figure()
 # plt.axis('equal')
@@ -145,12 +170,12 @@ print('accumulated euclidean distance: ', np.sum(euclidean_distance))
 print('accumulated euclidean distance diff: ', np.sum(euclidean_distance_diff))
 print('accumulated euclidean distance diff abs: ', np.sum(np.abs(euclidean_distance_diff)))
 
-csv_file = 'csv/aligned/' + folder_name +'/'+ sys.argv[1].split('/')[-1].split('.')[0]
-csv_file += '_vs_' + sys.argv[2].split('/')[1].split('--')[0] + '.csv'
-if not os.path.exists('csv/aligned/' + folder_name):
-    os.makedirs('csv/aligned/' + folder_name)
-df_data.to_csv(csv_file, index=False)
-print('saved csv to: ' + csv_file)
+# csv_file = 'csv/aligned/' + folder_name +'/'+ sys.argv[1].split('/')[-1].split('.')[0]
+# csv_file += '_vs_' + sys.argv[2].split('/')[1].split('--')[0] + '.csv'
+# if not os.path.exists('csv/aligned/' + folder_name):
+#     os.makedirs('csv/aligned/' + folder_name)
+# df_data.to_csv(csv_file, index=False)
+# print('saved csv to: ' + csv_file)
 
 if show_plot_time > 0:
     plt.show(block=False)
