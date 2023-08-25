@@ -27,20 +27,50 @@ num_of_tests_per_slam_combi = len(list_slam_repet_trajec_ape[0])
 # list length #slams with arrays length N with ate elements
 # N ates pro SLAM
 list_slam_repet_ate = [ates_from_columns(list_slam_repet_trajec_ape[i]) for i in range(0, len(list_slam_repet_trajec_ape))]
-# make mean and std of ate
+# make mean and std of ate. list of length #slams
+# ATE mean über alle N Trajektorien
 list_slam_ate_mean = [np.mean(list_slam_repet_ate[i]) for i in range(0, len(list_slam_repet_ate))]
+# ATE std über alle N Trajektorien
 list_slam_ate_std = [np.std(list_slam_repet_ate[i]) for i in range(0, len(list_slam_repet_ate))]
+# ATE max über alle N Trajektorien
+list_slam_ate_max = [np.max(list_slam_repet_ate[i]) for i in range(0, len(list_slam_repet_ate))]
+#gesamte std über alle ape aus alle trajectorien zusammen genommen
 
 # make dataframe from list_slam_ate_mean
 df_ate = pd.DataFrame()
 df_ate["mean"] = list_slam_ate_mean
 df_ate["std"] = list_slam_ate_std
+df_ate["max"] = list_slam_ate_max
 # to latex
 latex_ate = df_ate.to_latex()
 for i in range(0, len(names_of_slams)):
     latex_ate = latex_ate.replace('\n'+str(i)+' & ', '\n'+names_of_slams[i]+' & ')
-save_latex_table(latex_ate, folder_save, "ate", "mean_std")
+# replace "\toprule \\ & mean" with "\toprule \\ ATE (mm) & mean"
+latex_ate = latex_ate.replace(' & mean', 'ATE (mm) & mean')
+save_latex_table(latex_ate, folder_save, "ate", "mean_std_max")
 print(latex_ate)
+
+list_slam_repet_rte = [ates_from_columns(list_slam_repet_trajec_rpe[i]) for i in range(0, len(list_slam_repet_trajec_rpe))]
+# make mean, std and max of rte
+list_slam_rpe_mean = [np.mean(list_slam_repet_rte[i]) for i in range(0, len(list_slam_repet_rte))]
+list_slam_rpe_std = [np.std(list_slam_repet_rte[i]) for i in range(0, len(list_slam_repet_rte))]
+list_slam_rpe_max = [np.max(list_slam_repet_rte[i]) for i in range(0, len(list_slam_repet_rte))]
+
+# make dataframe from list_slam_rpe_mean
+df_rpe = pd.DataFrame()
+df_rpe["mean"] = list_slam_rpe_mean
+df_rpe["std"] = list_slam_rpe_std
+df_rpe["max"] = list_slam_rpe_max
+# to latex
+latex_rpe = df_rpe.to_latex()
+for i in range(0, len(names_of_slams)):
+    latex_rpe = latex_rpe.replace('\n'+str(i)+' & ', '\n'+names_of_slams[i]+' & ')
+latex_rpe = latex_rpe.replace(' & mean', 'RTE (mm) & mean')
+save_latex_table(latex_rpe, folder_save, "rpe", "mean_std_max")
+print(latex_rpe)
+
+
+
 
 
 
