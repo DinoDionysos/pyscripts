@@ -6,11 +6,11 @@ import os
 
 show_plot_time = int(sys.argv[3])
 
-plt.style.use('dark_background')
-plt.rcParams.update({
-    "axes.facecolor": (0.3,0.3,0.3),
-    "figure.facecolor": (0.1,0.1,0.1),
-    "grid.color": (0.3,0.3,0.3)}),
+# plt.style.use('dark_background')
+# plt.rcParams.update({
+#     "axes.facecolor": (0.3,0.3,0.3),
+#     "figure.facecolor": (0.1,0.1,0.1),
+#     "grid.color": (0.3,0.3,0.3)}),
 
 pos_fig_x = 1200
 pos_fig_y = 100
@@ -50,6 +50,7 @@ true_points = true_points.T
 mapping_points = mapping_points.T
 
 # source:https://zpl.fi/aligning-point-patterns-with-kabsch-umeyama-algorithm/
+# take only the first from true_points points from 50 to 100 for A and B
 A = true_points
 B = mapping_points
 n, m = A.shape
@@ -64,11 +65,14 @@ R = U @ S @ VT
 c = VarA / np.trace(np.diag(D) @ S)
 t = EA - c * R @ EB
 if('mono' in folder_name.split('_')):
-    B = np.array([t + c * R @ b for b in B])
+    B = np.array([ 5*b for b in mapping_points]) # t + c * R @ # np.array([2,-2])
 else:
-    B = np.array([t + R @ b for b in B])
+    B = np.array([t + c * R @ b for b in mapping_points])
 mapped_xy = B
-true_points = A
+# true_points = A
+plot_title = 'raw data'
+
+
 
 euclidean_distance = np.linalg.norm(mapped_xy - true_points, axis=1)
 euclidean_distance_diff = np.diff(euclidean_distance)
