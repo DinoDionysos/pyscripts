@@ -1,5 +1,9 @@
 bags/*
-# csv/*
+csv/*
+csv/aligned/*
+csv/aligned/c8_orb_d435/*
+csv/aligned/c8_orb_mono/*
+csv/aligned/c8_orb_stereo/*
 bags_windows_shortcut.lnk
 copy_figures.py
 .vscode/*
