@@ -65,7 +65,7 @@ R = U @ S @ VT
 c = VarA / np.trace(np.diag(D) @ S)
 t = EA - c * R @ EB
 if('mono' in folder_name.split('_')):
-    B = np.array([ 5*b for b in mapping_points]) # t + c * R @ # np.array([2,-2])
+    B = np.array([t + c * R @ b for b in mapping_points]) # t + c * R @ # np.array([2,-2])
 else:
     B = np.array([t + c * R @ b for b in mapping_points])
 mapped_xy = B
