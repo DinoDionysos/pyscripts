@@ -65,10 +65,11 @@ for i in range(0, len(stereo)):
 cmap = plt.cm.get_cmap('RdYlGn')
 plt.imshow(count_array, cmap=cmap, vmin=0, vmax=1)
 fontsize= 12
+plt.title("U statistic of two samples as area under/over the curve", fontsize=fontsize)
 # xlabel
-plt.xlabel("index of ordered elements in dataset 1", fontsize=fontsize)
+plt.xlabel("index i of ascending sorted elements in sample x", fontsize=fontsize)
 # ylabel
-plt.ylabel("index of ordered elements in dataset 2", fontsize=fontsize)
+plt.ylabel("# of s $\in$ sample y with s < sample x at i", fontsize=fontsize)
 # axis tick font size
 plt.xticks(fontsize=fontsize)
 plt.yticks(fontsize=fontsize)
@@ -78,20 +79,21 @@ count_list_smaller_new = []
 for i in range(0, len(count_list_smaller)):
     count_list_smaller_new.append(len(rgbd) - count_list_smaller[i])
 # plt.plot(count_list_smaller_new, color='black')
-plt.plot(count_list_bigger, color='white')
+plt.plot(count_list_bigger, color='black', label="curve")
 # make list that has its index as element
-count_list_index = []
-for i in range(0, len(count_list_smaller)):
-    count_list_index.append((i/len(stereo)*len(rgbd)))
-plt.plot(count_list_index, color='black')
+# count_list_index = []
+# for i in range(0, len(count_list_smaller)):
+#     count_list_index.append((i/len(stereo)*len(rgbd)))
+# plt.plot(count_list_index, color='white')
 # add text to upper left corner
 space_red = 250
-plt.text( space_red, len(rgbd)-space_red, "red area: U of dataset 2", fontsize=fontsize)
+plt.text( space_red, len(rgbd)-space_red, "red area: U of sample y", fontsize=fontsize)
 # add text to lower right corner
 space_green = 150
-plt.text(len(stereo)-700, space_green, "green area: U of dataset 1", fontsize=fontsize)
+plt.text(len(stereo)-700, space_green, "green area: U of sample x", fontsize=fontsize)
 # flip the ticks of the y axis without flipping the plot
 plt.gca().invert_yaxis()
+plt.legend( fontsize=fontsize)
 plt.savefig(folder_save + "mwu_visualization.pdf")
 plt.show()
 
