@@ -3,7 +3,75 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import os
-from util_hypothesis_tests import *
+# from util_hypothesis_tests import *
+from scipy.stats import mannwhitneyu
+size1= 1000
+size2= 1500
+# make a sample of 1000 points from a normal distribution with mean 0 and std 1
+sample = np.random.normal(0, 1, size1)
+# # make a sample of 1000 points from a normal distribution with mean 0.1 and std 1
+sample2 = np.random.normal(0.1, 1, size2)
+#do mann whitney u test
+alpha_mwu = 0.05
+stat1, p1 = mannwhitneyu(sample, sample2, alternative ='two-sided')
+print('mwu stat = %.1f, p=%.15f' % (stat1, p1), end='')
+if p1 > alpha_mwu:
+    print('Same distribution (fail to reject H0) pvalue=%d' % p1)
+else:
+    print('Different distribution (reject H0) pvalue=%.15f' % p1)
+stat2, p2 = mannwhitneyu(sample2, sample, alternative ='two-sided')
+print('mwu stat = %.1f, p=%.15f' % (stat2, p2), end='')
+if p2 > alpha_mwu:
+    print('Same distribution (fail to reject H0) pvalue=%d' % p2)
+else:
+    print('Different distribution (reject H0) pvalue=%.15f' % p2)
+# get mu of U
+mu = size1*size2/2
+# get sigma of U
+sigma = np.sqrt(size1*size2*(size1+size2+1)/12)
+# get z value of stat
+z1 = (stat1 - mu)/ sigma
+print('z = %.15f' % z1)
+# get p value from z value
+from scipy.stats import norm
+p1 = norm.sf(abs(z1))*2
+print('p = %.15f' % p1)
+# get z value of stat
+z2 = (stat2 - mu)/ sigma
+print('z = %.15f' % z2)
+# get p value from z value
+from scipy.stats import norm
+p2 = norm.sf(abs(z2))*2
+print('p = %.15f' % p2)
+
+
+
+
+# # get pearson correlation coefficient
+# r = np.sqrt(stat1/(size1*size2))
+# print('r = %.15f' % r)
+# #  cohen coefficient
+# from numpy import mean
+# from numpy import std
+# mu1 = mean(sample)
+# mu2 = mean(sample2)
+# # pooled std
+# std1 = std(sample)
+# std2 = std(sample2)
+# pooled_std = np.sqrt(((size1-1)*std1**2 + (size2-1)*std2**2)/(size1+size2-2))
+# # cohen coefficient
+# cohen_coeff = (mu1 - mu2)/pooled_std
+# print('cohen coefficient = %.15f' % cohen_coeff)
+
+
+
+
+#calc the pearson correlation coefficient
+# from scipy.stats import pearsonr
+# corr, _ = pearsonr(sample, sample2)
+# print('Pearsons correlation: %.3f' % corr)
+
+
 
 #input
 # 1: folder path with rotated csv files
@@ -11,35 +79,35 @@ from util_hypothesis_tests import *
 # 3: range start to compare pairwise folder_1 and folder_2
 # 3: range end to compare pairwise folder_1 and folder_2
 
-folder_1 = sys.argv[1]
-folder_2 = sys.argv[2]
-range_1 = int(sys.argv[3])
-range_2 = int(sys.argv[4])
+# folder_1 = sys.argv[1]
+# folder_2 = sys.argv[2]
+# range_1 = int(sys.argv[3])
+# range_2 = int(sys.argv[4])
 
 
 
-df_list_1 = []
-df_list_2 = []
+# df_list_1 = []
+# df_list_2 = []
 
-# get all the names of the csv in the folder and read them in
-for filename in os.listdir(folder_1):
-    if filename.endswith('.csv'):
-        df_list_1.append(pd.read_csv(os.path.join(folder_1, filename)))
-for filename in os.listdir(folder_2):
-    if filename.endswith('.csv'):
-        df_list_2.append(pd.read_csv(os.path.join(folder_2, filename)))
+# # get all the names of the csv in the folder and read them in
+# for filename in os.listdir(folder_1):
+#     if filename.endswith('.csv'):
+#         df_list_1.append(pd.read_csv(os.path.join(folder_1, filename)))
+# for filename in os.listdir(folder_2):
+#     if filename.endswith('.csv'):
+#         df_list_2.append(pd.read_csv(os.path.join(folder_2, filename)))
 
-from util_hypothesis_tests import *
-alpha_mwu = 0.05
-# convert the column 'dist' of df_list_1 to numpy and save it in another list for every entry
-distances_1 = []
-distances_2 = []
-for j in range(range_1,range_2):
-    distances_1.append(df_list_1[j]['dist'].to_numpy())
-    distances_2.append(df_list_2[j]['dist'].to_numpy())
+# from util_hypothesis_tests import *
+# alpha_mwu = 0.05
+# # convert the column 'dist' of df_list_1 to numpy and save it in another list for every entry
+# distances_1 = []
+# distances_2 = []
+# for j in range(range_1,range_2):
+#     distances_1.append(df_list_1[j]['dist'].to_numpy())
+#     distances_2.append(df_list_2[j]['dist'].to_numpy())
 
-pmean_mwu_test, pvalues_mwu_test = mannwhitneyu_n(distances_1, distances_2, alpha_mwu, print_every=True)
-print('mean pvalue = %.15f ' % pmean_mwu_test)
+# pmean_mwu_test, pvalues_mwu_test = mannwhitneyu_n(distances_1, distances_2, alpha_mwu, print_every=True)
+# print('mean pvalue = %.15f ' % pmean_mwu_test)
 
 # make dataframe from pvalues_mwu_test
 
