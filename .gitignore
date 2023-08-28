@@ -14,3 +14,5 @@ __pycache__/*
 !bags/sim_record.sh
 !bags/split_bag.sh
 !bags/play_cX.py
+playground.py
+ignore/*
