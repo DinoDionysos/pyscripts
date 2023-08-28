@@ -1,4 +1,4 @@
-
+import pandas as pd
 
 
 def add_midrule_over(row_name : list, latex_string):
@@ -21,7 +21,10 @@ def add_header(names_for_headers, latex_string_diff, self=False):
     latex_string_diff = latex_string_diff.replace("\n\\toprule\n\\midrule\n", header_string)
     return latex_string_diff
 
-def make_latex_table_pvalues_reject_fail(df, caption, label, precision=6):
+def replace_toprule(latex_string, new_toprule):
+    return latex_string.replace("\n\\toprule\n", "\n" + new_toprule + "\n")
+
+def make_latex_table_pvalues_reject_fail(df, caption, label, precision):
     latex_string = df.to_latex(header=True, float_format=f"%.{precision}f", index=True)
     # multiline header
     # latex_string = add_header(names_for_headers, latex_string)
@@ -33,7 +36,23 @@ def make_latex_table_pvalues_reject_fail(df, caption, label, precision=6):
     latex_string += label
     return latex_string
 
-def save_latex_table(latex_string_self, folder, error_type, test_name, postfix=""):
-    with open(folder + test_name +"_"+ error_type +"_"+ postfix + ".tex", "w") as f:
+def save_latex_table(latex_string_self, folder, save_name):
+    with open(folder + save_name, "w") as f:
             f.write(latex_string_self)
             f.close()
+
+def df_template(num_rows, num_cols):
+    cols = []
+    for i in range(0,num_rows):
+        col = []
+        for j in range(0,num_cols):
+            col.append("_column_"+str(i)+"_row_"+str(j))
+        cols.append(col)
+    df = pd.DataFrame(cols)
+    df.columns = ["_header_"+str(i) for i in range(0,num_cols)]
+    df.index = ["_index_"+str(i) for i in range(0,num_rows)]
+    return df
+
+def latex_table_template(num_rows, num_cols, index=False, header=True):
+    df = df_template(num_rows, num_cols)
+    return df.to_latex(index=index, header=header)
