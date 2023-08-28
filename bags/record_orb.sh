@@ -28,6 +28,7 @@ done
 rosbag record --buffsize 0 -O $name.bag \
 /ground_truth/odom \
 /orb_slam3/camera_pose \
+/orb_slam3_ros/trajectory
 
 
 

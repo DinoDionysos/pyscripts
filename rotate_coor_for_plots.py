@@ -97,7 +97,21 @@ else:
 mapped_xy = B
 # true_points = A
 
-
+def umeyama(A,B):
+    """Aligns B to A, both of shape (N,m). N=#points, m=dimensionality."""
+    n, m = A.shape
+    EA = np.mean(A, axis=0)
+    EB = np.mean(B, axis=0)
+    VarA = np.mean(np.linalg.norm(A - EA, axis=1) ** 2)
+    H = ((A - EA).T @ (B - EB)) / n
+    U, D, VT = np.linalg.svd(H)
+    d = np.sign(np.linalg.det(U) * np.linalg.det(VT))
+    S = np.diag([1] * (m - 1) + [d])
+    R = U @ S @ VT
+    c = VarA / np.trace(np.diag(D) @ S)
+    t = EA - c * R @ EB
+    B = np.array([t + c * R @ b for b in mapping_points])
+    return B
 
 
 euclidean_distance = np.linalg.norm(mapped_xy - true_points, axis=1)

@@ -5,17 +5,18 @@ import numpy as np
 #works
 def qat2rpy(x,y,z,w):
     # roll (x-axis rotation)
-    sinr_cosp = 2 * (w * x + y * z)
+    sinr_cosp = 2 * (w * x + z * y)
     cosr_cosp = 1 - 2 * (x * x + y * y)
     roll = np.arctan2(sinr_cosp, cosr_cosp)
 
     # pitch (y-axis rotation)
     sinp = 2 * (w * y - z * x)
-    if np.abs(sinp) >= 1:
-        pitch = np.copysign(np.pi / 2, sinp)  # use 90 degrees if out of range
-    else:
-        pitch = np.arcsin(sinp)
-
+    # if np.abs(sinp) >= 1:
+    #     pitch = np.copysign(np.pi / 2, sinp)  # use 90 degrees if out of range
+    # else:
+    #     pitch = np.arcsin(sinp)
+    pitch = np.arcsin(sinp)
+    
     # yaw (z-axis rotation)
     siny_cosp = 2 * (w * z + x * y)
     cosy_cosp = 1 - 2 * (y * y + z * z)
@@ -26,8 +27,8 @@ def qat2rpy(x,y,z,w):
 # source:https://stackoverflow.com/questions/5782658/extracting-yaw-from-a-quaternion
 def qat2rpy2(x,y,z,w):
     roll  = np.arctan2(2.0 * (w * y + z * x) , 1.0 - 2.0 * (x * x + y * y))
-    pitch = np.arcsin(2.0 * (y * w - z * x))
-    yaw   = np.arctan2(2.0 * (z * w + x * y) , - 1.0 + 2.0 * (w * w + x * x))
+    pitch = np.arcsin(2.0 * (w * y - z * x))
+    yaw   = np.arctan2(2.0 * (w * z + x * y) , - 1.0 + 2.0 * (w * w + x * x))
     return roll, pitch, yaw
 
 #source:https://robotics.stackexchange.com/questions/16471/get-yaw-from-quaternion
