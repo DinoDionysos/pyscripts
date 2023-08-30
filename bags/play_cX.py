@@ -1,22 +1,32 @@
 import os
 import sys
-#1: short cut of rosbag
-#2: (optional) folder path (default: current folder)
-
+path='/media/dino/Samsung_T5/rosbags/'
+folder_rosbags = path
 short_cut = sys.argv[1]
-print(short_cut)
-if len(sys.argv) > 2:
-    folder = sys.argv[2]
-else: 
-    # get current folder path
-    folder = os.path.dirname(os.path.realpath(__file__))
+#get all the folders in the path
+folders = os.listdir(path)
+#check if one of the directory starts with the short_cut
+for folder in folders:
+    if folder.startswith(short_cut):
+        print(folder)
+        if os.path.isdir(path + folder):
+            print(folder)
+            #if so, set the folder to path + folder
+            folder_rosbags = path + folder
+            print('playing rosbags in folder: ' + folder_rosbags)
+            break
+if folder == path:
+    print('playing from default folder: ' + folder_rosbags)
+
 # get all files in the folder
-files = os.listdir(folder)
+files = os.listdir(folder_rosbags)
 # put a string together with "rosbag play " + all files
 command = "rosbag play --skip-empty=1 "
 for file in files:
-    if file.endswith(".bag") and file.startswith(short_cut):
-        command += folder + "/" + file + " "
+    # if file starts with short_cut and ends with .bag
+    if file.startswith(short_cut) and file.endswith(".bag"):
+        # add the file to the command
+        command += folder_rosbags + "/" + file + " "
 # print the command
 print(command)
 # pause for 1 seconds
