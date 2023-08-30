@@ -1,4 +1,4 @@
-rosbag record --buffsize 0 --split --size 8192 -O c8_fun \
+rosbag record --buffsize 0 --split --size 2048 -O $1 \
 /ground_truth/odom \
 /realsense_d435/color/camera_info \
 /realsense_d435/color/image_raw \
@@ -9,5 +9,4 @@ rosbag record --buffsize 0 --split --size 8192 -O c8_fun \
 /stereo_camera/right/camera_info \
 /stereo_camera/right/image_raw \
 /taurob_tracker/imu/data \
-# /tf \
 /tf_static \
