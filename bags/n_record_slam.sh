@@ -21,7 +21,7 @@ do
   echo "Starting playing"
   sleep 0.5
   # rosbag play c7_circle_lockstep_c4_frac.bag
-  python3 play_cX.py c8_fun
+  python3 play_cX.py c8
   sleep 2
   killall record
   sleep 1
