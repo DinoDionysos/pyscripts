@@ -1,5 +1,5 @@
 #!/bin/bash
-# $1: folder name where the folder $2 is inside (f.e. orb)
+# $1: folder name where the folder $2 wil be inside (f.e. orb)
 # $2: prefix and folder name of the bagfile (c7_orb_d435)
 
 # check if $2 exists as folder
