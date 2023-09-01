@@ -7,8 +7,20 @@ from scipy.spatial.transform import Rotation
 from scipy.spatial.transform import Slerp
 
 
-
+short_cut_data = sys.argv[1]
+number = sys.argv[2]
 show_plot_time = int(sys.argv[3])
+folder_prefix = sys.argv[4] # c8_orb_mono
+folder_ssd = sys.argv[5] # /mnt/d
+folder_orb = sys.argv[6] # orb
+
+path_gt = folder_ssd + '/csv/' + folder_orb + '/' + folder_prefix + '/' + folder_prefix + '_' + number + '-gt.csv'
+path_data = folder_ssd + '/csv/' + folder_orb + '/' + folder_prefix + '/' + folder_prefix + '_' + number + '-'+short_cut_data+'.csv'
+
+# show_plot_time = 2
+# folder_prefix = "c9_orb_stereo"
+# path_1 = "/mnt/d/csv/orb/"+folder_prefix+"/"+folder_prefix+"_1-gt.csv"
+# path_2 = "/mnt/d/csv/orb/"+folder_prefix+"/"+folder_prefix+"_1-orb.csv"
 
 # plt.style.use('dark_background')
 # plt.rcParams.update({
@@ -18,12 +30,19 @@ show_plot_time = int(sys.argv[3])
 
 pos_fig_x = 1200
 pos_fig_y = 100
-folder_name = sys.argv[1].split('/')[2] # f.e. c8_orb_mono
+divide_time = 100000.0
 
-divide_time = 1000000
+df_gt = pd.read_csv(path_gt)
+df_data = pd.read_csv(path_data)
+print(path_gt)
+print(path_data)
 
-df_gt = pd.read_csv(sys.argv[1])
-df_data = pd.read_csv(sys.argv[2])
+# sort both for timestamp
+df_gt = df_gt.sort_values(by=['stamp'])
+df_data = df_data.sort_values(by=['stamp'])
+# drop duplicates
+df_gt = df_gt.drop_duplicates(subset=['stamp'], keep='first')
+# df_data = df_data.drop_duplicates(subset=['stamp'], keep='first')
 
 # shift both timestamps with df_data_timestamp[0]. This is just a normalization for df_data and a shift for df_gt!
 # devide by 1000000
@@ -45,24 +64,32 @@ df_gt['seq'] = df_gt['seq'] - df_gt['seq'][0]
 df_gt['x'] = df_gt['x'] - df_gt['x'][0]
 df_gt['y'] = df_gt['y'] - df_gt['y'][0]
 df_gt['z'] = df_gt['z'] - df_gt['z'][0]
-df_data['seq'] = df_data['seq'] - df_data['seq'][0]
-df_data['x'] = df_data['x'] - df_data['x'][0]
-df_data['y'] = df_data['y'] - df_data['y'][0]
-df_data['z'] = df_data['z'] - df_data['z'][0]
+# df_data['seq'] = df_data['seq'] - df_data['seq'][0]
+# df_data['x'] = df_data['x'] - df_data['x'][0]
+# df_data['y'] = df_data['y'] - df_data['y'][0]
+# df_data['z'] = df_data['z'] - df_data['z'][0]
+# acces with .loc instead
+df_data.loc[:, 'seq'] = df_data.loc[:, 'seq'] - df_data.loc[:, 'seq'][0]
+df_data.loc[:, 'x'] = df_data.loc[:, 'x'] - df_data.loc[:, 'x'][0]
+df_data.loc[:, 'y'] = df_data.loc[:, 'y'] - df_data.loc[:, 'y'][0]
+df_data.loc[:, 'z'] = df_data.loc[:, 'z'] - df_data.loc[:, 'z'][0]
+
 #shift both timestamps with df_data_timestamp[0]. This is just a normalization for df_data and a shift for df_gt!
 import copy
 shift_by = copy.deepcopy(df_data_timestamp[0])
 df_data_timestamp = df_data_timestamp - shift_by
 df_gt_timestamp = df_gt_timestamp - shift_by
-# devide
+# devide them both but with floating point division
 df_data_timestamp = df_data_timestamp / divide_time
 df_gt_timestamp = df_gt_timestamp / divide_time
-print('shifted by: ', shift_by)
-# [0] print
-print('df_data_timestamp[0]: ', df_data_timestamp[0])
-print('df_gt_timestamp[0]: ', df_gt_timestamp[0])
-print('df_data_timestamp[-1]: ', df_data_timestamp[-1])
-print('df_gt_timestamp[-1]: ', df_gt_timestamp[-1])
+
+# check if the timestamps are ascending and if
+# print('shifted by: ', shift_by)
+# # [0] print
+# print('df_data_timestamp[0]: ', df_data_timestamp[0])
+# print('df_gt_timestamp[0]: ', df_gt_timestamp[0])
+# print('df_data_timestamp[-1]: ', df_data_timestamp[-1])
+# print('df_gt_timestamp[-1]: ', df_gt_timestamp[-1])
 
 
 
@@ -79,11 +106,37 @@ def get_rotations_from_quaternions(df : pd.DataFrame, d435=False):
     return list_of_rotations
 
     #get the list of rotations from the data and gt
-if 'orb' in sys.argv[2] and 'd435' in sys.argv[2]:
+if 'orb' in folder_prefix and 'd435' in folder_prefix:
     list_of_rotations_data = get_rotations_from_quaternions(df_data, d435=True)
 else:
     list_of_rotations_data = get_rotations_from_quaternions(df_data)
 list_of_rotations_gt = get_rotations_from_quaternions(df_gt)
+
+####### DEBUGGING #######
+# # show where the df_gt_timestamps are not ascending
+# print(np.where(np.diff(df_gt_timestamp) <= 0))
+# print(df_gt_timestamp[np.where(np.diff(df_gt_timestamp) <= 0)])
+# # check the same for the column of df_gt['stamp']
+# print(np.where(np.diff(df_gt['stamp'].to_numpy()) <= 0))
+# print(df_gt['stamp'].to_numpy()[np.where(np.diff(df_gt['stamp'].to_numpy()) <= 0)])
+# #make two subplots
+# fig, (ax1, ax2) = plt.subplots(2)
+# # plot df_gt_timestamp 
+# ax1.plot(df_gt_timestamp)
+# # and df_gt['stamp'] in a different plot
+# ax2.plot(df_gt['stamp'].to_numpy())
+# # mark the places where the timestamps are not ascending
+# ax1.plot(np.where(np.diff(df_gt_timestamp) <= 0)[0], df_gt_timestamp[np.where(np.diff(df_gt_timestamp) <= 0)], 'go')
+# ax2.plot(np.where(np.diff(df_gt['stamp'].to_numpy()) <= 0)[0], df_gt['stamp'].to_numpy()[np.where(np.diff(df_gt['stamp'].to_numpy()) <= 0)], 'go')
+# plt.show()
+# #print name of csv file
+# print('df_data: ', path_data)
+# print('df_gt: ', path_gt)
+####### DEBUGGING #######
+
+
+
+
 #create slerp object with timestamp of gt and list of rotations of gt
 slerp = Slerp(df_gt_timestamp, list_of_rotations_gt)
 #interpolate the rotations of gt at the timestamps of data
@@ -98,7 +151,7 @@ pitch_gt = euler_gt[:,1]
 yaw_gt = euler_gt[:,2]
 roll = euler_data[:,0]
 pitch = euler_data[:,1]
-if 'orb' in sys.argv[2] and 'd435' in sys.argv[2]:
+if 'orb' in folder_prefix and 'd435' in folder_prefix:
     yaw = euler_data[:,2] * (-1)
 else:
     yaw = euler_data[:,2]
@@ -154,7 +207,7 @@ gt_y = np.interp(df_data_timestamp, df_gt_timestamp, gt_y)
 true_points = np.array([gt_x, gt_y])
 
 data_x = df_data['x'].to_numpy()
-if 'orb' in sys.argv[2] and 'd435' in sys.argv[2] and 'imu' not in sys.argv[2]:
+if 'orb' in folder_prefix and 'd435' in folder_prefix and 'imu' not in folder_prefix:
     data_y = df_data['z'].to_numpy()
 else:
     data_y = df_data['y'].to_numpy()
@@ -178,7 +231,7 @@ R = U @ S @ VT
 c = VarA / np.trace(np.diag(D) @ S)
 t = EA - c * R @ EB
 B = np.array([t + c * R @ b for b in B])
-# if('mono' in folder_name.split('_')):
+# if('mono' in folder_prefix.split('_')):
 #     B = np.array([t + c * R @ b for b in mapping_points])
 # else:
 #     B = np.array([t + c * R @ b for b in mapping_points])
@@ -205,8 +258,8 @@ yaw_rpe = np.diff(yaw_ape)
 yaw_rpe = np.insert(yaw_rpe, 0, 0)
 
 #print max and min of yaw_diff
-print('yaw_diff max: ', np.max(yaw_ape))
-print('yaw_diff min: ', np.min(yaw_ape))
+# print('yaw_diff max: ', np.max(yaw_ape))
+# print('yaw_diff min: ', np.min(yaw_ape))
 
 df_data_time = df_data_time - df_data_time[0]
 df_data_timestamp = df_data_timestamp - df_data_timestamp[0]
@@ -233,7 +286,7 @@ df_data = pd.DataFrame({'seq': df_data['seq'].to_numpy(),
 
 fig = plt.figure()
 plt.axis('equal')
-plt.title(sys.argv[1].split('/')[-1] + ' vs ' + sys.argv[2].split('/')[1])
+plt.title(folder_prefix + ' ' + short_cut_data + ' ' + number)
 for i in range(len(true_points)):
     plt.plot([true_points[i,0], mapped_xy[i,0]], [true_points[i,1], mapped_xy[i,1]], color='gray')
 plt.plot(true_points[:,0], true_points[:,1], marker='o', markeredgecolor='black', label='true')
@@ -248,13 +301,16 @@ print('accumulated euclidean distance: ', np.sum(xy_ape))
 print('accumulated euclidean distance diff: ', np.sum(xy_rpe))
 print('accumulated euclidean distance diff abs: ', np.sum(np.abs(xy_rpe)))
 
-csv_file = 'csv/aligned/' + folder_name +'/'+ sys.argv[1].split('/')[-1].split('.')[0]
-csv_file += '_vs_' + sys.argv[2].split('/')[1].split('--')[0] + '.csv'
-if not os.path.exists('csv/aligned/' + folder_name):
-    os.makedirs('csv/aligned/' + folder_name)
-df_data.to_csv(csv_file, index=False)
+csv_folder = folder_ssd + '/csv/' + folder_orb + '/aligned/' + folder_prefix
+csv_file = folder_prefix + '_' + number + '-gt_vs_' + short_cut_data + '-aligned.csv'
+csv_path = csv_folder + '/' + csv_file
+
+if not os.path.exists(csv_folder):
+    os.makedirs(csv_folder)
+df_data.to_csv(csv_path, index=False)
 print('saved csv to: ' + csv_file)
 
+print("HOUSTON AN BASIS: SEGMENTATION FAULT FROM PLOT CLOSING INCOMING. PLEASE IGNORE")
 if show_plot_time > 0:
     plt.show(block=False)
     plt.pause(show_plot_time)

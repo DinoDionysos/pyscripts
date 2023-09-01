@@ -1,18 +1,18 @@
 import os
 import sys
-path='/media/dino/Samsung_T5/rosbags/'
+path=sys.argv[1]
 folder_rosbags = path
-short_cut = sys.argv[1]
+short_cut = sys.argv[2]
 #get all the folders in the path
 folders = os.listdir(path)
 #check if one of the directory starts with the short_cut
 for folder in folders:
     if folder.startswith(short_cut):
-        print(folder)
-        if os.path.isdir(path + folder):
+        print(path +'/'+ folder)
+        if os.path.isdir(path +'/'+ folder):
             print(folder)
             #if so, set the folder to path + folder
-            folder_rosbags = path + folder
+            folder_rosbags = path +'/'+ folder
             print('playing rosbags in folder: ' + folder_rosbags)
             break
 if folder == path:
