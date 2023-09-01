@@ -13,14 +13,18 @@ from util_latex_tables import *
 from util_error_measures import *
 
 # for changing to another simulation scenario the following variables need to be changed:
-scenario = "c8"
-folder_save = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/results/tables/"
+scenario = "c21"
+folder_results_win = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/results/"
+folder_results_ssd = "/mnt/d/results/"
+folder_save = folder_results_win + scenario + "/tables/"
 if not os.path.exists(folder_save):
     os.makedirs(folder_save)
 
-folders = ["csv/aligned/"+scenario+"_orb_stereo",\
-            "csv/aligned/"+scenario+"_orb_d435",\
-            "csv/aligned/"+scenario+"_orb_mono"]
+folder_ssd = "/mnt/d/"
+slam_names_for_files = ["stereo", "d435", "mono"]
+temp = folder_ssd+"csv/orb/aligned/"+scenario+"_orb_"
+folders = [temp + slam_names_for_files[i] for i in range(0, len(slam_names_for_files))]
+           
 list_slam_repet_trajec_ape = [read_cols_from_folder(folder, "xy_ape") for folder in folders] 
 # list of length #folders of lists of length N with array with #(poses in traj) ape elements
 # N ape arrays pro SLAM
@@ -37,8 +41,7 @@ correlation_names = ["f", "r"]
 num_of_tests_per_slam_combi = len(list_slam_repet_trajec_ape[0])
 
 
-
-
+print(folders)
 
 
 #hierarchy of the datastructures:
@@ -74,6 +77,7 @@ for error_type in ["ape", "rpe"]:
                     for test_idx in range(0, len(test_names)): 
                         # here we have a combination of two slams and their index
                         # and now we loop every test to do the N tests and a column in the dataframe
+                        # make the columns equally long maybe 
                         list_pvalues = hypothesis_test_list(columns[slam_idx_1], columns[slam_idx_2], test_name = test_names[test_idx])
                         # count the number of pvalues that are above alpha
                         count_fail = sum([1 for i in list_pvalues if i > alpha])
@@ -126,26 +130,23 @@ for error_type in ["ape", "rpe"]:
                     else:
                         verbose_switch_1 = "The table shows"
                         verbose_switch_2 = "means and standard deviations of the effect strength coefficients $f$ and $r$"
-                    caption = "\caption{Comparison of %s and %s. %s the counts of rejection and fails of rejection. The two columns on the right show the %s. The error measure is the %s \\ac{%s}.}\n" % (
-                        names_of_slams[slam_idx_1], 
-                        names_of_slams[slam_idx_2],
+                    caption = "\caption{Scenario %s: Comparison of %s and %s. %s the counts of rejection and fails of rejection. The two columns on the right show the %s. The error measure is the %s \\ac{%s}.}\n" % (
+                        scenario,
+                        short_of_slams[slam_idx_1], 
+                        short_of_slams[slam_idx_2],
                         verbose_switch_1,
                         verbose_switch_2,
                         data_type_print, 
                         error_type)
                     label = "\label{tab:%s_%s_%s_%s_%s}\n" % (
-                        names_of_slams[slam_idx_1], 
-                        names_of_slams[slam_idx_2],
+                        short_of_slams[slam_idx_1], 
+                        short_of_slams[slam_idx_2],
                         data_type, 
                         error_type, 
                         postfix)
-                    title = "& & \multicolumn{%d}{c}{%s and %s | error = %s \\ac{%s}} & \\\\ \n \midrule"%(
-                        len(test_names), 
-                        names_of_slams[slam_idx_1], 
-                        names_of_slams[slam_idx_2], 
-                        data_type_print, error_type)
-                    title = "\multicolumn{%d}{c}{%s and %s}\\\\ \multicolumn{%d}{c}{error = %s \\ac{%s}}\\\\ \multicolumn{%d}{c}{significance level $\\alpha$ = %d%s}\\\\"%(
+                    title = "\multicolumn{%d}{c}{Scenario %s: %s and %s}\\\\ \multicolumn{%d}{c}{error = %s \\ac{%s}}\\\\ \multicolumn{%d}{c}{significance level $\\alpha$ = %d%s}\\\\"%(
                         len(test_names)+len(correlation_names)+1,
+                        scenario,
                         names_of_slams[slam_idx_1], 
                         names_of_slams[slam_idx_2], 
                         len(test_names)+len(correlation_names)+1,
@@ -173,6 +174,7 @@ for error_type in ["ape", "rpe"]:
                     latex_string = replace_toprule(latex_string, title)
                     # write latex table
                     save_name = \
+                        scenario +"_"+ \
                         short_of_slams[slam_idx_1] +"_"+ \
                         short_of_slams[slam_idx_2] +"_"+ \
                         data_type +"_"+ \
@@ -217,24 +219,21 @@ for error_type in ["ape", "rpe"]:
                         verbose_switch_1 = "The table shows"
                         verbose_switch_2 = " means and standard deviations of the effect strength coefficients $f$ and $r$"
 
-                    caption = "\caption{Check for normality of %s. %s the counts of rejection and failed rejections. The two columns on the right show the %s. The error measure is the %s \\ac{%s}.}\n" % (
+                    caption = "\caption{Scenario %s: Test for normality of the \\ac{rpe}s of %s. %s the counts of rejection and failed rejections. The two columns on the right show the %s. The error measure is the %s \\ac{%s}.}\n" % (
+                        scenario,
                         names_of_slams[slam_idx_1],
                         verbose_switch_1,
                         verbose_switch_2,
                         data_type_print,
                         error_type)
                     label = "\label{tab:%s_%s_%s_%s}\n" % (
-                        names_of_slams[slam_idx_1],
+                        short_of_slams[slam_idx_1],
                         data_type, 
                         error_type, 
                         postfix)
-                    title = "\multicolumn{%d}{c}{Check for normality %s | error = %s \\ac{%s}}  \\\\ \n \midrule"%(
-                        len(test_names_normal), 
-                        names_of_slams[slam_idx_1], 
-                        data_type_print, 
-                        error_type)
-                    title = "\multicolumn{%d}{c}{Check for normality %s}\\\\ \multicolumn{%d}{c}{error = %s \\ac{%s}}\\\\ \multicolumn{%d}{c}{significance level $\\alpha$ = %d%s}\\\\"%(
-                        len(test_names_normal)+1,  
+                    title = "\multicolumn{%d}{c}{Scenario %s: Test for normality of \\ac{rpe}s %s}\\\\ \multicolumn{%d}{c}{error = %s \\ac{%s}}\\\\ \multicolumn{%d}{c}{significance level $\\alpha$ = %d%s}\\\\"%(
+                        len(test_names_normal)+1, 
+                        scenario, 
                         names_of_slams[slam_idx_1],
                         len(test_names_normal)+1,
                         data_type_print, 
@@ -246,6 +245,7 @@ for error_type in ["ape", "rpe"]:
                     latex_string = replace_toprule(latex_string, title)
                     # write latex table
                     save_name = \
+                        scenario +"_"+ \
                         short_of_slams[slam_idx_1] +"_"+ \
                         data_type +"_"+ \
                         error_type + \
@@ -260,130 +260,84 @@ for error_type in ["ape", "rpe"]:
 
 
 
-sys.exit(1)
-
-
-
-
-# list length #slams with arrays length N with T ate elements
-# N ates pro SLAM
-list_slam_repet_ate = [ates_from_columns(list_slam_repet_trajec_ape[i]) for i in range(0, len(list_slam_repet_trajec_ape))]
-# make mean and std of ate. list of length #slams
-# ATE mean über alle N Trajektorien
-list_slam_ate_mean = [np.mean(list_slam_repet_ate[i]) for i in range(0, len(list_slam_repet_ate))]
-# ATE std über alle N Trajektorien
-list_slam_ate_std = [np.std(list_slam_repet_ate[i]) for i in range(0, len(list_slam_repet_ate))]
-# ATE max über alle N Trajektorien
-list_slam_ate_max = [np.max(list_slam_repet_ate[i]) for i in range(0, len(list_slam_repet_ate))]
-#gesamte std über alle ape aus alle trajectorien zusammen genommen
-
-# make dataframe from list_slam_ate_mean
-df_ate = pd.DataFrame()
-df_ate["mean"] = list_slam_ate_mean
-df_ate["std"] = list_slam_ate_std
-df_ate["max"] = list_slam_ate_max
-# to latex
-latex_ate = df_ate.to_latex()
-for i in range(0, len(short_of_slams)):
-    latex_ate = latex_ate.replace('\n'+str(i)+' & ', '\n'+short_of_slams[i]+' & ')
-# replace "\toprule \\ & mean" with "\toprule \\ ATE (mm) & mean"
-latex_ate = latex_ate.replace(' & mean', 'ATE (mm) & mean')
-save_latex_table(latex_ate, folder_save, "ate", "mean_std_max")
-print(latex_ate)
-
-list_slam_repet_rte = [ates_from_columns(list_slam_repet_trajec_rpe[i]) for i in range(0, len(list_slam_repet_trajec_rpe))]
-# make mean, std and max of rte
-list_slam_rpe_mean = [np.mean(list_slam_repet_rte[i]) for i in range(0, len(list_slam_repet_rte))]
-list_slam_rpe_std = [np.std(list_slam_repet_rte[i]) for i in range(0, len(list_slam_repet_rte))]
-list_slam_rpe_max = [np.max(list_slam_repet_rte[i]) for i in range(0, len(list_slam_repet_rte))]
-
-# make dataframe from list_slam_rpe_mean
-df_rpe = pd.DataFrame()
-df_rpe["mean"] = list_slam_rpe_mean
-df_rpe["std"] = list_slam_rpe_std
-df_rpe["max"] = list_slam_rpe_max
-# to latex
-latex_rpe = df_rpe.to_latex()
-for i in range(0, len(short_of_slams)):
-    latex_rpe = latex_rpe.replace('\n'+str(i)+' & ', '\n'+short_of_slams[i]+' & ')
-latex_rpe = latex_rpe.replace(' & mean', 'RTE (mm) & mean')
-save_latex_table(latex_rpe, folder_save, "rpe", "mean_std_max")
-print(latex_rpe)
 
 
 
 
 
-for error_type in ["ape", "rpe"]:
-    if error_type == "ape":
-        columns = list_slam_repet_trajec_ape
-    else:
-        columns = list_slam_repet_trajec_rpe
 
 
-    for test_idx in range(0, len(test_names)):   
-        ### switch test loop and slam loop to get the new table structure ########################################################################################################################################################
 
-        ### make dataframe and calculations ####################################
-        df_diff = pd.DataFrame()
-        for i in range(0, len(folders)):
-            ### switch test loop and slam loop to get the new table structure ################################################################################################################################################
-            for j in range(0, i): # begin for loop over slam combinations i!=j
-                list_pvalues = hypothesis_test_list(columns[i], columns[j], test_names[test_idx])
-                count_fail = sum([1 for i in list_pvalues if i > alpha])
-                count_reject = len(list_pvalues) - count_fail
-                # new_col_name = names_for_headers[i] + " vs " + names_for_headers[j]
-                new_col_name = make_column_header(short_of_slams[i], short_of_slams[j])
-                df_diff[new_col_name] = list_pvalues + [count_reject, count_fail]
-                # end of for loop over slam combinations i!=j
-        # name the last two columns reject and fail
-        df_diff.rename(index={len(list_pvalues): "reject", len(list_pvalues) + 1: "fail"}, inplace=True)
-        ## end make dataframe and caluclations #################################
-
-        # maybe the dataframes need to be split up here vertically if two many combinations are tested. just index the latex tables then with 1,2,3,...
-
-        postfix = "to_another"
-        caption = "\caption{Each column shows the comparison of two \\ac{slam} approaches with %d p-values from \\ac{%s} tests on \\ac{%s} data.}\n" % (num_of_tests_per_slam_combi, test_names[test_idx], error_type)
-        label = "\label{tab:%s_%s_%s}\n" % (test_names[test_idx], error_type, postfix)
-        ## make latex string
-        latex_string_diff = make_latex_table_pvalues_reject_fail(df_diff, caption, label, precision)
-        # write latex table
-        save_latex_table(latex_string_diff, folder_save, error_type, test_names[test_idx], postfix)
-
-        # end of loop over tests
-        # end of loop over ape rpe
+# for error_type in ["ape", "rpe"]:
+#     if error_type == "ape":
+#         columns = list_slam_repet_trajec_ape
+#     else:
+#         columns = list_slam_repet_trajec_rpe
 
 
-for error_type in ["ape", "rpe"]:
-    if error_type == "ape":
-        columns = list_slam_repet_trajec_ape
-    else:
-        columns = list_slam_repet_trajec_rpe
+#     for test_idx in range(0, len(test_names)):   
+#         ### switch test loop and slam loop to get the new table structure ########################################################################################################################################################
+
+#         ### make dataframe and calculations ####################################
+#         df_diff = pd.DataFrame()
+#         for i in range(0, len(folders)):
+#             ### switch test loop and slam loop to get the new table structure ################################################################################################################################################
+#             for j in range(0, i): # begin for loop over slam combinations i!=j
+#                 list_pvalues = hypothesis_test_list(columns[i], columns[j], test_names[test_idx])
+#                 count_fail = sum([1 for i in list_pvalues if i > alpha])
+#                 count_reject = len(list_pvalues) - count_fail
+#                 # new_col_name = names_for_headers[i] + " vs " + names_for_headers[j]
+#                 new_col_name = make_column_header(short_of_slams[i], short_of_slams[j])
+#                 df_diff[new_col_name] = list_pvalues + [count_reject, count_fail]
+#                 # end of for loop over slam combinations i!=j
+#         # name the last two columns reject and fail
+#         df_diff.rename(index={len(list_pvalues): "reject", len(list_pvalues) + 1: "fail"}, inplace=True)
+#         ## end make dataframe and caluclations #################################
+
+#         # maybe the dataframes need to be split up here vertically if two many combinations are tested. just index the latex tables then with 1,2,3,...
+
+#         postfix = "to_another"
+#         caption = "\caption{Each column shows the comparison of two \\ac{slam} approaches with %d p-values from \\ac{%s} tests on \\ac{%s} data.}\n" % (num_of_tests_per_slam_combi, test_names[test_idx], error_type)
+#         label = "\label{tab:%s_%s_%s}\n" % (test_names[test_idx], error_type, postfix)
+#         ## make latex string
+#         latex_string_diff = make_latex_table_pvalues_reject_fail(df_diff, caption, label, precision)
+#         # write latex table
+#         save_latex_table(latex_string_diff, folder_save, error_type, test_names[test_idx], postfix)
+
+#         # end of loop over tests
+#         # end of loop over ape rpe
+
+
+# for error_type in ["ape", "rpe"]:
+#     if error_type == "ape":
+#         columns = list_slam_repet_trajec_ape
+#     else:
+#         columns = list_slam_repet_trajec_rpe
 
         
-    for test_idx in range(0, len(test_names)):  
+#     for test_idx in range(0, len(test_names)):  
 
-        num_of_tests_per_slam = int(num_of_tests_per_slam_combi/2)
-        d = num_of_tests_per_slam
+#         num_of_tests_per_slam = int(num_of_tests_per_slam_combi/2)
+#         d = num_of_tests_per_slam
 
-        df_self = pd.DataFrame()
-        for i in range(0, len(folders)):
-            # begin for loop over slams  i==i
-            list_pvalues = hypothesis_test_list(columns[i][:d], columns[i][d:], test_names[test_idx])
-            count_fail = sum([1 for i in list_pvalues if i > alpha])
-            count_reject = len(list_pvalues) - count_fail
-            new_col_name = make_column_header(short_of_slams[i], short_of_slams[j])
-            df_self[new_col_name] = list_pvalues + [count_reject, count_fail]
-            # end of for loop over slam combinations i==i
-        # name the last two columns reject and fail
-        df_self.rename(index={len(list_pvalues): "reject", len(list_pvalues) + 1: "fail"}, inplace=True)
+#         df_self = pd.DataFrame()
+#         for i in range(0, len(folders)):
+#             # begin for loop over slams  i==i
+#             list_pvalues = hypothesis_test_list(columns[i][:d], columns[i][d:], test_names[test_idx])
+#             count_fail = sum([1 for i in list_pvalues if i > alpha])
+#             count_reject = len(list_pvalues) - count_fail
+#             new_col_name = make_column_header(short_of_slams[i], short_of_slams[j])
+#             df_self[new_col_name] = list_pvalues + [count_reject, count_fail]
+#             # end of for loop over slam combinations i==i
+#         # name the last two columns reject and fail
+#         df_self.rename(index={len(list_pvalues): "reject", len(list_pvalues) + 1: "fail"}, inplace=True)
 
-        # maybe the dataframes need to be split up here vertically if two many combinations are tested. just index the latex tables then with 1,2,3,...
-        postfix = "to_itself"
-        caption = "\caption{Each column shows the comparison of a \\ac{slam} approach with itself with %d p-values from \\ac{%s} tests on \\ac{%s} data.}\n" % (num_of_tests_per_slam, test_names[test_idx], error_type)
-        label = "\label{tab:%s_%s_%s}\n" % (test_names[test_idx], error_type, postfix)
-        # make latex string
-        latex_string_self = make_latex_table_pvalues_reject_fail(df_self, caption, label, precision)
+#         # maybe the dataframes need to be split up here vertically if two many combinations are tested. just index the latex tables then with 1,2,3,...
+#         postfix = "to_itself"
+#         caption = "\caption{Each column shows the comparison of a \\ac{slam} approach with itself with %d p-values from \\ac{%s} tests on \\ac{%s} data.}\n" % (num_of_tests_per_slam, test_names[test_idx], error_type)
+#         label = "\label{tab:%s_%s_%s}\n" % (test_names[test_idx], error_type, postfix)
+#         # make latex string
+#         latex_string_self = make_latex_table_pvalues_reject_fail(df_self, caption, label, precision)
 
-        # write latex table
-        save_latex_table(latex_string_self, folder_save, error_type, test_names[test_idx], postfix)
+#         # write latex table
+#         save_latex_table(latex_string_self, folder_save, error_type, test_names[test_idx], postfix)
