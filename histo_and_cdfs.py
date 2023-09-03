@@ -10,7 +10,7 @@ from util_error_measures import *
 from scipy.stats import norm
 
 # complete list of scenarios with results
-scenarios_num = [9, 14, 15, 16, 17, 19, 21, 28, 29, 33, 34, 46, 47, 48, 49, 50, 51]
+scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
 
 # for changing to another simulation scenario the following variables need to be changed:
 # scenarios_num = [47,50,49,51,48,46,45]
@@ -32,7 +32,6 @@ for scenario in scenarios:
     names_of_slams = ['stereo', 'RGBD', 'mono']
     alpha = 0.05
     test_names = ["mwu", "ks2"]
-    fontsize = 15
 
 
 
@@ -45,8 +44,8 @@ for scenario in scenarios:
         return x, y
 
     #same but make variable fontsize with 16
-    fontsize = 16
-    fontsize_2 = 11
+    fontsize = 17
+    fontsize_2 = 12
     fontsize_legend = 10
 
 
@@ -54,8 +53,8 @@ for scenario in scenarios:
     colors = plt.cm.tab20(np.linspace(0,1,20))
     #make 3 line styles
     line_styles = ['-', '--', ':']
-    color_slams = [['black', 'darkgreen', 'red'],['black', 'green', 'red']]
-    edgecolor_slams = ['green', 'orange']
+    color_slams = [['black', 'darkgreen', 'red'],['black', 'darkgreen', 'red']]
+    edgecolor_slams = ['green', 'green']
     alpha_histograms = [1.0, 0.5, 1.0]
     histtype = ['stepfilled', 'stepfilled', 'step']
     linewidth = [1, 1, 2]
@@ -82,7 +81,8 @@ for scenario in scenarios:
         for error_type in ["ape", "rpe"]:
             error_idx+=1
             print(data_type +' '+error_type)
-            fig, axs = plt.subplots(2, 1, figsize=(12, 7))
+            fig = plt.figure(figsize=(12, 3.5))
+            fig_4 = plt.figure(figsize=(12, 3.5))
             fig_2, axs_2 = plt.subplots(sub_y, sub_x, figsize=(8, 10))
             fig_3, axs_3 = plt.subplots(sub_y, sub_x, figsize=(8, 10))
             columns = [read_cols_from_folder(folder, data_type +'_'+error_type) for folder in folders] 
@@ -91,6 +91,7 @@ for scenario in scenarios:
                 list_slam_concat.append(np.concatenate(columns[i]))
 
             ########################################################## cdfs
+            plt.figure(fig_4.number)
             slam_N_x_list = []
             # iterate over all slams
             ymax = 0
@@ -110,9 +111,9 @@ for scenario in scenarios:
                     alpha = 0.3
                     linewidth_cdf = 1.5
                     if j == 0 :
-                        axs[1].plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], alpha=alpha, linewidth=linewidth_cdf, label=names_of_slams[i] + ' single')
+                        plt.plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], alpha=alpha, linewidth=linewidth_cdf, label=names_of_slams[i] + ' single')
                     else:
-                        axs[1].plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], alpha=alpha, linewidth=linewidth_cdf)
+                        plt.plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], alpha=alpha, linewidth=linewidth_cdf)
 
                     #############cdf pairs##############
                     axs_2[j//sub_x, j%sub_x].plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], alpha=1.0, linewidth=linewidth_cdf_pairs, label=names_of_slams[i])
@@ -196,10 +197,10 @@ for scenario in scenarios:
                     axs_3[j//sub_x, j%sub_x].set_ylim(0.0, ymax)
 
 
-            axs[1].set_xlabel(error_type.upper() + " ("+data_unit+")", fontsize=fontsize)
-            axs[1].set_ylabel('Cumulative Probability', fontsize=fontsize)
+            plt.xlabel(error_type.upper() + " ("+data_unit+")", fontsize=fontsize)
+            plt.ylabel('Cumulative Probability', fontsize=fontsize)
             # plt.legend()
-            # axs[1].set_title('Scenario '+scenario+', '+data_type_name+' '+error_type.upper()+': Empirical CDFs of every trajectory and of all trajectories merged', fontsize=fontsize)
+            # plt.set_title('Scenario '+scenario+', '+data_type_name+' '+error_type.upper()+': Empirical CDFs of every trajectory and of all trajectories merged', fontsize=fontsize)
 
             slam_concat_x_list = []
             linewidth_cdf_fat = 5
@@ -213,15 +214,17 @@ for scenario in scenarios:
                 x = x[len(x)-len(y):]
                 slam_concat_x_list.append(x)
                 # plot
-                axs[1].plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], linewidth=linewidth_cdf_fat, alpha = 1.0, label=names_of_slams[i] + ' merged')
+                plt.plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], linewidth=linewidth_cdf_fat, alpha = 1.0, label=names_of_slams[i] + ' merged')
 
             #legende in lower right corner
-            axs[1].legend(loc='lower right', fontsize=fontsize)
-            axs[1].tick_params(axis='both', which='major', labelsize=fontsize)
-            axs[1].tick_params(axis='both', which='minor', labelsize=fontsize)
+            plt.legend(loc='lower right', fontsize=fontsize)
+            plt.tick_params(axis='both', which='major', labelsize=fontsize)
+            plt.tick_params(axis='both', which='minor', labelsize=fontsize)
+            #get axis limits of plot above
+            xmin, xmax = plt.xlim()
 
             ########################################################### histogram
-
+            plt.figure(fig.number)
             post_fix_label = ' merged'
             # k of rice
             # get the length of every ape array in list_slam_concat
@@ -229,35 +232,33 @@ for scenario in scenarios:
             # make individual k_rice for every list_slam_concat
             k_rice = [int(2 * N[i]**(1/3)) for i in range(0, len(slam_concat_x_list))]
             #make histogram with k_rice bins for concatenated ape arrays
-            n_0,_,_ = axs[0].hist(slam_concat_x_list[0], bins=k_rice[0], density=True, 
+            n_0,_,_ = plt.hist(slam_concat_x_list[0], bins=k_rice[0], density=True, 
                         histtype='stepfilled', color=color_slams[error_idx%2][0],
                         label=names_of_slams[0]+post_fix_label, linewidth=linewidth[0])
             
-            n_1,_,_ = axs[0].hist(slam_concat_x_list[1], bins=k_rice[1], density=True, 
+            n_1,_,_ = plt.hist(slam_concat_x_list[1], bins=k_rice[1], density=True, 
                         histtype='stepfilled', color=color_slams[error_idx%2][1], alpha=0.5, label=names_of_slams[1]+post_fix_label, linewidth=linewidth[1], 
                         edgecolor= edgecolor_slams[error_idx%2])
 
-            n_2,_,_ = axs[0].hist(slam_concat_x_list[1], bins=k_rice[1], density=True, 
+            n_2,_,_ = plt.hist(slam_concat_x_list[1], bins=k_rice[1], density=True, 
                         histtype='step', color=color_slams[error_idx%2][1], alpha=1.0, linewidth=linewidth[1], 
                         edgecolor= edgecolor_slams[error_idx%2])
 
-            n_3,_,_ = axs[0].hist(slam_concat_x_list[2], bins=k_rice[2], density=True, 
+            n_3,_,_ = plt.hist(slam_concat_x_list[2], bins=k_rice[2], density=True, 
                         histtype='step', color=color_slams[error_idx%2][2], alpha=1.0, 
                         label=names_of_slams[2]+post_fix_label, linewidth=linewidth[2], zorder=10)
             n = [n_0, n_1, n_2, n_3]
             n = [np.max(n[i]) for i in range(0, len(n))]
             n_max = np.max(n)
-            axs[0].set_ylim(0.0, n_max*1.05)
-            # axs[0].set_title("Scenario "+scenario+" "+data_type_name+" "+error_type.upper()+": Histogram of the errors merged over all trajectories",fontsize=fontsize)
-            axs[0].set_xlabel(error_type.upper()+" ("+data_unit+")", fontsize=fontsize)
-            axs[0].set_ylabel("Probability", fontsize=fontsize)
-            axs[0].tick_params(axis='both', which='major', labelsize=fontsize)
-            axs[0].tick_params(axis='both', which='minor', labelsize=fontsize)
+            plt.ylim(0.0, n_max*1.05)
+            # plt.set_title("Scenario "+scenario+" "+data_type_name+" "+error_type.upper()+": Histogram of the errors merged over all trajectories",fontsize=fontsize)
+            plt.xlabel(error_type.upper()+" ("+data_unit+")", fontsize=fontsize)
+            plt.ylabel("Probability", fontsize=fontsize)
+            plt.tick_params(axis='both', which='major', labelsize=fontsize)
+            plt.tick_params(axis='both', which='minor', labelsize=fontsize)
             #get the max value of the histogram  
-            #get axis limits of plot above
-            xmin, xmax = axs[1].get_xlim()
             #set axis limits of plot below
-            axs[0].set_xlim(xmin, xmax)
+            plt.xlim(xmin, xmax)
             # if rpe get mean and std of the x_list elements
             # if error_type == "rpe":
             #     for i in range(0, len(x_list)):
@@ -265,14 +266,21 @@ for scenario in scenarios:
             #         sigma =np.std(x_list[i])
             #         #plot a normal distribution with mu and sigma
             #         x = np.linspace(mu - 3*sigma, mu + 3*sigma, 100)
-            #         axs[0].plot(x, norm.pdf(x, mu, sigma), color=color_slams[error_idx%2][i], linestyle=line_styles[i], linewidth=linewidth/2, alpha = 0.6, label=names_of_slams[i] + ' normal pdf')
-            axs[0].legend(fontsize=fontsize)
+            #         plt.plot(x, norm.pdf(x, mu, sigma), color=color_slams[error_idx%2][i], linestyle=line_styles[i], linewidth=linewidth/2, alpha = 0.6, label=names_of_slams[i] + ' normal pdf')
+            plt.legend(fontsize=fontsize)
 
 
             # save plot as pdf in folder save
             plt.figure(fig.number)
             plt.tight_layout()
-            plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_cdfs_histo.pdf'), bbox_inches='tight')
+            plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_histo.pdf'), bbox_inches='tight')
+
+            # save fig_4 as pdf in folder save
+            plt.figure(fig_4.number)
+            plt.tight_layout()
+            plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_cdfs.pdf'), bbox_inches='tight')
+
+
             # save fig_2
             plt.figure(fig_2.number)
             #set the title of the figure
@@ -289,9 +297,10 @@ for scenario in scenarios:
             # plt.show()
             # matplotlib.pyplot.close()
             #close the figures
-            plt.close(fig)
-            plt.close(fig_2)
-            plt.close(fig_3)
+            plt.close(fig.number)
+            plt.close(fig_2.number)
+            plt.close(fig_3.number)
+            plt.close('all')
 
 
 
