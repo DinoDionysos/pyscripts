@@ -9,8 +9,11 @@ from util_latex_tables import *
 from util_error_measures import *
 from scipy.stats import norm
 
+# complete list of scenarios with results
+scenarios_num = [9, 14, 15, 16, 17, 19, 21, 28, 29, 33, 34, 46, 47, 48, 49, 50, 51]
+
 # for changing to another simulation scenario the following variables need to be changed:
-scenarios_num = [9, 14, 15, 16, 17, 19, 21, 28,29,33,34]
+# scenarios_num = [47,50,49,51,48,46,45]
 scenarios = ["c"+str(i) for i in scenarios_num]
 for scenario in scenarios:
     print('scenario', scenario)
@@ -196,7 +199,7 @@ for scenario in scenarios:
             axs[1].set_xlabel(error_type.upper() + " ("+data_unit+")", fontsize=fontsize)
             axs[1].set_ylabel('Cumulative Probability', fontsize=fontsize)
             # plt.legend()
-            axs[1].set_title('Scenario '+scenario+', '+data_type_name+' '+error_type.upper()+': Empirical CDFs of every trajectory and of all trajectories merged', fontsize=fontsize)
+            # axs[1].set_title('Scenario '+scenario+', '+data_type_name+' '+error_type.upper()+': Empirical CDFs of every trajectory and of all trajectories merged', fontsize=fontsize)
 
             slam_concat_x_list = []
             linewidth_cdf_fat = 5
@@ -245,7 +248,7 @@ for scenario in scenarios:
             n = [np.max(n[i]) for i in range(0, len(n))]
             n_max = np.max(n)
             axs[0].set_ylim(0.0, n_max*1.05)
-            axs[0].set_title("Scenario "+scenario+" "+data_type_name+" "+error_type.upper()+": Histogram of the errors merged over all trajectories",fontsize=fontsize)
+            # axs[0].set_title("Scenario "+scenario+" "+data_type_name+" "+error_type.upper()+": Histogram of the errors merged over all trajectories",fontsize=fontsize)
             axs[0].set_xlabel(error_type.upper()+" ("+data_unit+")", fontsize=fontsize)
             axs[0].set_ylabel("Probability", fontsize=fontsize)
             axs[0].tick_params(axis='both', which='major', labelsize=fontsize)
@@ -273,13 +276,13 @@ for scenario in scenarios:
             # save fig_2
             plt.figure(fig_2.number)
             #set the title of the figure
-            fig_2.suptitle("Scenario "+scenario+" "+data_type_name+" "+error_type.upper()+": Empirical CDFs of every trajectory pair", fontsize=fontsize)
+            # fig_2.suptitle("Scenario "+scenario+" "+data_type_name+" "+error_type.upper()+": Empirical CDFs of every trajectory pair", fontsize=fontsize)
             plt.tight_layout()
             plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_all_cdf_pairs.pdf'), bbox_inches='tight')
             # save fig_3
             plt.figure(fig_3.number)
             #set the title of the figure
-            fig_3.suptitle("Scenario "+scenario+" "+data_type_name+" "+error_type.upper()+": Histogram of the errors of every trajectory pair", fontsize=fontsize)
+            # fig_3.suptitle("Scenario "+scenario+" "+data_type_name+" "+error_type.upper()+": Histogram of the errors of every trajectory pair", fontsize=fontsize)
             plt.tight_layout()
             plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_all_histo_pairs.pdf'), bbox_inches='tight')
 
