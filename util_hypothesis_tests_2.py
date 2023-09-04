@@ -14,6 +14,14 @@ from scipy.stats import kendalltau
 import os
 import pandas as pd
 
+def kendallstau(data_1 : np.array, data_2 : np.array):
+    """kendall's tau. returns stat, p"""
+    return kendalltau(data_1, data_2)
+
+def spearmanr(data_1 : np.array, data_2 : np.array):
+    """spearman's r. returns stat, p"""
+    return spearmanr(data_1, data_2)
+
 def kruskalwallis_test(data_1 : np.array, data_2 : np.array):
     """kruskal test. returns stat, p"""
     return kruskal(data_1, data_2, nan_policy='omit')
@@ -67,7 +75,8 @@ def lilliefors_test(data : np.array):
 
 def read_df_from_folder(folder):
     """reads all the csv in the folder into a list of dataframes. returns list of dataframes"""
-    return [pd.read_csv(os.path.join(folder, filename)) for filename in os.listdir(folder)]
+    sorted_folders = sorted(os.listdir(folder))
+    return [pd.read_csv(os.path.join(folder, filename)) for filename in sorted_folders]
 
 def read_col_from_dataframes(df_list, col_name):
     """reads a certain column (f.e. 'dist') from all the dataframes in the df_list and returns them as a list of numpy arrays"""
@@ -109,6 +118,9 @@ def hypothesis_test(data_1 : np.array, data_2 : np.array, test_name):
     kw_names = ['kruskalwallis', 'kw', 'kruskalwallis_test', 'KW', 'KruskalWallis', 'kruskal', 'Kruskal', 'Kruskal Wallis']
     bm_names = ['brunnermunzel', 'bm', 'BM', 'BrunnerMunzel', 'brunner', 'munzel', 'Brunner Munzel', 'Brunner']
     bf_names = ['brownforsythe', 'bf', 'brownforsythe_test', 'BF', 'BrownForsythe', 'BrownForsythe_test', 'brown', 'forsythe', 'Brown', 'Forsythe', 'levene', 'Levene', 'Brown Forsythe', 'BF']
+    kt_names = ['tau', 'TAU', 'kendallstau', 'kt', 'kendalltau', 'KendallTau', 'KendallTau_test', 'Kendall', 'Tau', 'Kendall Tau', 'KT']
+    sr_names = ['spearmanr', 'sr', 'spearman', 'Spearman', 'SpearmanR', 'SpearmanR_test', 'Spearman R', 'SR']
+                
     if test_name in mwu_names:
         return mannwhitneyu_test(data_1, data_2)
     elif test_name in ks_names:
@@ -119,6 +131,10 @@ def hypothesis_test(data_1 : np.array, data_2 : np.array, test_name):
         return brunnermunzel_test(data_1, data_2)
     elif test_name in bf_names:
         return brownforsythe_test(data_1, data_2)
+    elif test_name in kt_names:
+        return kendallstau(data_1, data_2)
+    elif test_name in sr_names:
+        return spearmanr(data_1, data_2)
     else:
         raise ValueError('invalid test name for hypothesis test')
     

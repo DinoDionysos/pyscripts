@@ -56,3 +56,11 @@ def df_template(num_rows, num_cols):
 def latex_table_template(num_rows, num_cols, index=False, header=True):
     df = df_template(num_rows, num_cols)
     return df.to_latex(index=index, header=header)
+
+
+def add_caption_label_to_latex_string(latex_string, caption, label):
+    # add caption add the end of the string
+    latex_string += "\caption{%s}\n" % caption
+    # add label add the end of the string
+    latex_string += "\label{%s}" % label
+    return latex_string

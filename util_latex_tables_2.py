@@ -37,54 +37,61 @@ def insert_at(df, content, row_index, col_idx):
     df.iloc[row_index, col_idx] = content
     return df
 
-len_test_names = 5
+
+
+
 len_correlation_names = 1
 len_mean_std_column = 1
 len_reject_fail_column = 1
 len_xy_yaw_rpe_ape_columns = 2
-
-
-len_test_names = 5
-len_correlation_names = 1
-len_mean_std_column = 1
-len_reject_fail_column = 1
-len_xy_yaw_rpe_ape_columns = 2
-width_table = len_test_names + len_correlation_names + len_mean_std_column + len_reject_fail_column + len_xy_yaw_rpe_ape_columns
+num_cols_temp = len_xy_yaw_rpe_ape_columns + len_reject_fail_column 
 
 # make a dataframe with 3 columns and 4 rows with '' in each cell
 len_rules = 5 - 1 # weil bottomrule schon da ist
 len_rows = 11
 len_clines = 3
 
-def df_latex_table_template():
+def df_latex_table_template(test_names, correlation_names=[]):
     num_rows = len_rows + len_rules + len_clines
-    num_cols = width_table
+    if len(correlation_names) == 0:
+        num_cols = num_cols_temp + len(test_names)
+    else:
+        num_cols = num_cols_temp + len(test_names) + len(correlation_names) + len_mean_std_column
+    print('num_rows', num_rows)
+    print('num_cols', num_cols)
     df = pd.DataFrame([['' for i in range(0, num_cols)] for j in range(0, num_rows)])
     # df = pd.DataFrame() 
-    test_names = ["KS2", 'BF', "KW", 'BM', "MWU"]
-    correlation_names = ['f']
-    line = ['evalution type','', ''] + test_names  + correlation_names + ['']
+    #test_names = ["KS2", 'BF', "KW", 'BM', "MWU"]
+    # correlation_names = ['f']
+    line = ['error data type', '', ''] + test_names
+    if len(correlation_names) != 0:
+        line += [''] + correlation_names
     # insert a line at row 0
     df = insert_rule_at(df, '\midrule', 2)
     df = insert_row_at(df, line, 3)
     df = insert_rule_at(df, '\midrule', 4)
     df = insert_rule_at(df, '\midrule', 5)
     df = insert_multirow_at(df, 'translational', row_index=6, col_idx=0, num_rows=4)
-    df = insert_multirow_at(df, 'APE', row_index=6, col_idx=1, num_rows=2)
-    df = insert_multirow_at(df, 'RPE', row_index=9, col_idx=1, num_rows=2)
+    df = insert_multirow_at(df, '  APE  ', row_index=6, col_idx=1, num_rows=2)
+    df = insert_multirow_at(df, '  RPE  ', row_index=9, col_idx=1, num_rows=2)
     df = insert_multirow_at(df, 'rotational', row_index=12, col_idx=0, num_rows=4)
-    df = insert_multirow_at(df, 'APE', row_index=12, col_idx=1, num_rows=2)
-    df = insert_multirow_at(df, 'RPE', row_index=15, col_idx=1, num_rows=2)
+    df = insert_multirow_at(df, '  APE  ', row_index=12, col_idx=1, num_rows=2)
+    df = insert_multirow_at(df, '  RPE  ', row_index=15, col_idx=1, num_rows=2)
     # line = [1,2,3,4,5]
     # df = insert_list_at(df, line, row_index=6, col_idx=3)
     # line_f = 0.421
     # df = insert_at(df, line_f, row_index=6, col_idx=9)
 
     for i in range(0, 4):
-        df = insert_at(df, 'reject', row_index=6+i*3, col_idx=2)
-        df = insert_at(df, 'fail', row_index=7+i*3, col_idx=2)
-        df = insert_at(df, 'mean', row_index=6+i*3, col_idx=8)
-        df = insert_at(df, 'std', row_index=7+i*3, col_idx=8)
+        df = insert_at(df, 'reject', row_index=6+i*3, 
+                       col_idx=len_xy_yaw_rpe_ape_columns)
+        df = insert_at(df, 'fail', row_index=7+i*3, 
+                       col_idx=len_xy_yaw_rpe_ape_columns)
+        if len(correlation_names) != 0:
+            df = insert_at(df, 'mean', row_index=6+i*3, 
+                        col_idx=num_cols - len(correlation_names)-1)
+            df = insert_at(df, 'std', row_index=7+i*3, 
+                        col_idx=num_cols - len(correlation_names)-1)
 
     df = insert_rule_at(df, '\cline{2-%d}'%(num_cols), 8)
     df = insert_rule_at(df, '\cline{1-%d}'%(num_cols), 11)
@@ -93,10 +100,12 @@ def df_latex_table_template():
 
     return df
 
-def latex_table_from_df_template(df, caption, label):
-
-    col_format = 'll|lrrrrr|lr'
-    df_latex = df.to_latex(index=False,header=False,index_names=False, column_format=col_format, float_format="%.4f")
+def latex_table_from_df_template(df, caption, label, precision, test_names, correlation_names=[]):
+    if len(correlation_names) == 0:
+        col_format = 'll|l' + 'r' * len(test_names)
+    else:
+        col_format = 'll|l' + 'r' * len(test_names)+ '|l' + 'r' * len(correlation_names)
+    df_latex = df.to_latex(index=False,header=False,index_names=False, column_format=col_format, float_format=f"%.{precision}f")
     #remove the \toprule and \midrule with replace ''
     df_latex = df_latex.replace('\\toprule\n\midrule\n', '')
     # get the number of cols of the df
