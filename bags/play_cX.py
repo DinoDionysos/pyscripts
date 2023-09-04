@@ -21,7 +21,7 @@ if folder == path:
 # get all files in the folder
 files = os.listdir(folder_rosbags)
 # put a string together with "rosbag play " + all files
-command = "rosbag play --skip-empty=1 "
+command = "rosbag play --skip-empty=1 --quiet "
 for file in files:
     # if file starts with short_cut and ends with .bag
     if file.startswith(short_cut) and file.endswith(".bag"):
