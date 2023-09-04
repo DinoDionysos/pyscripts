@@ -13,10 +13,25 @@ from util_latex_tables import *
 from util_latex_tables_2 import *
 from util_error_measures import *
 
+
+scenario_names = {
+    9: "wide outdoor loop",
+    15: "narrow outdoor space",
+    28: "collapsed fire station",
+    19: "wide outdoor straight",
+    17: "narrow outdoor straight",
+    51: "collapsed house indoor",
+    49: "wide outdoor curvy",
+    34: "narrow outdoor curvy"
+}
+
 # for changing to another simulation scenario the following variables need to be changed:
-scenarios_num = [9, 14, 15, 16, 17, 19, 21, 28,29,33,34]
+# scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
+scenarios_num = [15, 28, 19, 17, 51, 49, 34]
 scenarios = ["c"+str(i) for i in scenarios_num]
+c=-1
 for scenario in scenarios:
+    c+=1
     print('scenario', scenario)
     folder_results_win = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/results/"
     folder_results_ssd = "/mnt/d/results/"
@@ -39,19 +54,21 @@ for scenario in scenarios:
     names_of_slams = ['ORB-SLAM stereo', 'ORB-SLAM RGBD', 'ORB-SLAM mono']
     short_of_slams = ['stereo', 'RGBD', 'mono']
     alpha = 0.05
-    precision = 4
-    test_names = ["KS2", 'BF', "KW", 'BM', "MWU"]
+    precision = 2
+    test_names = ["KS2", "TAU"]#, "TAU"]
     test_names_normal = ["SW", "KS", "SK", "LF"]
-    correlation_names = ["f"]
+    correlation_names = []#"f"]
 
     ################################# loop slam combis ###########################
     for slam_idx_1 in range(0,len(folders)):
         for slam_idx_2 in range(0, slam_idx_1):
             df = pd.DataFrame()
             # make the Dataframe the correct form and fill it
-            df = df_latex_table_template()
-            df = insert_multicol_at(df, 'Scenario '+scenario+': '+names_of_slams[slam_idx_1]+' and '+ names_of_slams[slam_idx_2], 0)
-            df = insert_multicol_at(df, 'Significance level $\\alpha$ = '+str(alpha*100)+'\%', 1)
+            #TODO: add test_names to the function parameters
+            df = df_latex_table_template(test_names, correlation_names)
+            df = insert_multicol_at(df, 'Scenario '+scenario_names[scenarios_num[c]]+':', 0)
+            df = insert_multicol_at(df,names_of_slams[slam_idx_1]+' and '+ names_of_slams[slam_idx_2], 1)
+            df = insert_multicol_at(df, 'Significance level $\\alpha$ = '+str(alpha*100)+'\%', 2)
             # print('hello from slam', slam_idx_1, slam_idx_2)
             ############################### loop rotat trans ####################
             data_idx = -1
@@ -69,6 +86,8 @@ for scenario in scenarios:
                     error_idx += 1
                     columns = xy_yaw_rpe_ape_columns[2*data_idx+error_idx]
                     ############################### loop tests ####################
+                    offset_row = 6
+                    offset_col = 3
                     for test_idx in range(0, len(test_names)): 
                         # print('test_idx', test_idx)
                         list_pvalues = hypothesis_test_list(
@@ -80,8 +99,6 @@ for scenario in scenarios:
                         # count the number of pvalues that are below alpha
                         count_reject = len(list_pvalues) - count_fail
                         # use insert_line_at and insert_at to fill the dataframe
-                        offset_row = 6
-                        offset_col = 3
                         row_index=offset_row+data_idx*6+3*error_idx
                         col_idx=offset_col+test_idx
                         df.iloc[row_index, col_idx] = count_reject
@@ -99,11 +116,11 @@ for scenario in scenarios:
                         mean = np.mean(np.array(list_correlation_values))
                         std = np.std(np.array(list_correlation_values))
                         row_index=offset_row+data_idx*6+3*error_idx
-                        col_idx=offset_col+6+correlation_idx
+                        col_idx=offset_col+len(test_names)+1+correlation_idx
                         df.iloc[row_index, col_idx] = mean
                         df.iloc[row_index+1, col_idx] = std
-            caption = "Scenario %s: Evaluation of %s and %s. The table shows the counts of rejection and fails of rejection. The two columns on the right show the mean and standard deviation of the effect strength coefficients $f$. The rotational error and the translational error is shown as \\ac{ape} and \\ac{rpe}" % (
-                            scenario,
+            caption = "Scenario %s: Evaluation of %s and %s. The table shows the counts of rejection and fails of rejection of the hypothesis tests \\ac{ks2}, \\ac{bf}, \\ac{kw}, \\ac{bm}, \\ac{mwu}. The tests were applied on the translational \\ac{ape} and \\ac{rpe} as well as the rotational. The two columns on the right show the mean and standard deviation of the effect strength coefficients $f$." % (
+                            scenario_names[scenarios_num[c]],
                             short_of_slams[slam_idx_1], 
                             short_of_slams[slam_idx_2])
             label = "tab:compact_%s_%s_%s" % (
@@ -111,7 +128,7 @@ for scenario in scenarios:
                 short_of_slams[slam_idx_1], 
                 short_of_slams[slam_idx_2])
             # def to latex with function from util_latex_tables_2.py
-            latex_string_table = latex_table_from_df_template(df, caption, label)
+            latex_string_table = latex_table_from_df_template(df, caption, label, precision, test_names, correlation_names)
             save_name = "compact_"+\
                 short_of_slams[slam_idx_1] +"_"+ \
                 short_of_slams[slam_idx_2] + ".tex"

@@ -9,13 +9,31 @@ from util_latex_tables import *
 from util_error_measures import *
 from scipy.stats import norm
 
-# complete list of scenarios with results
-scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
+scenario_names = {
+    9: "wide outdoor loop",
+    15: "narrow outdoor space",
+    28: "collapsed fire station",
+    19: "wide outdoor straight",
+    17: "narrow outdoor straight",
+    51: "collapsed house indoor",
+    49: "wide outdoor curvy",
+    34: "narrow outdoor curvy"
+}
 
+# complete list of scenarios with results
+# scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
+scenarios_num = [15, 28, 19, 17, 51, 49, 34]
+folder_latex_inputs_fig_caption_labels = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/inputs/input_results/fig_captions_labels/"
 # for changing to another simulation scenario the following variables need to be changed:
 # scenarios_num = [47,50,49,51,48,46,45]
+c = -1
 scenarios = ["c"+str(i) for i in scenarios_num]
 for scenario in scenarios:
+    c+=1
+    folder_latex_inputs_fig_caption_labels = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/inputs/input_results/fig_captions_labels/" + scenario + "/"
+    if not os.path.exists(folder_latex_inputs_fig_caption_labels):
+        os.makedirs(folder_latex_inputs_fig_caption_labels)
+
     print('scenario', scenario)
     folder_results_win = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/results/"
     folder_results_ssd = "/mnt/d/results/"
@@ -115,6 +133,13 @@ for scenario in scenarios:
                     else:
                         plt.plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], alpha=alpha, linewidth=linewidth_cdf)
 
+                    caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Empirical CDFs of every trajectory and of all trajectories merged for "+data_type_name+" "+error_type.upper()+" error data."
+                    label = "fig:"+scenario+"_"+data_type+"_"+error_type+"_cdf"
+                    caption_label = add_caption_label_to_latex_string("", caption, label)
+                    save_latex_table(
+                        caption_label, 
+                        folder_latex_inputs_fig_caption_labels, 
+                        scenario+"_"+data_type+"_"+error_type+"_cdfs.tex")
                     #############cdf pairs##############
                     axs_2[j//sub_x, j%sub_x].plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], alpha=1.0, linewidth=linewidth_cdf_pairs, label=names_of_slams[i])
                     # title of the plots is the number
@@ -197,7 +222,7 @@ for scenario in scenarios:
                     axs_3[j//sub_x, j%sub_x].set_ylim(0.0, ymax)
 
 
-            plt.xlabel(error_type.upper() + " ("+data_unit+")", fontsize=fontsize)
+            plt.xlabel(data_type_name +' '+ error_type.upper() + " ("+data_unit+")", fontsize=fontsize)
             plt.ylabel('Cumulative Probability', fontsize=fontsize)
             # plt.legend()
             # plt.set_title('Scenario '+scenario+', '+data_type_name+' '+error_type.upper()+': Empirical CDFs of every trajectory and of all trajectories merged', fontsize=fontsize)
@@ -252,7 +277,7 @@ for scenario in scenarios:
             n_max = np.max(n)
             plt.ylim(0.0, n_max*1.05)
             # plt.set_title("Scenario "+scenario+" "+data_type_name+" "+error_type.upper()+": Histogram of the errors merged over all trajectories",fontsize=fontsize)
-            plt.xlabel(error_type.upper()+" ("+data_unit+")", fontsize=fontsize)
+            plt.xlabel(data_type_name +' '+ error_type.upper()+" ("+data_unit+")", fontsize=fontsize)
             plt.ylabel("Probability", fontsize=fontsize)
             plt.tick_params(axis='both', which='major', labelsize=fontsize)
             plt.tick_params(axis='both', which='minor', labelsize=fontsize)
@@ -268,6 +293,13 @@ for scenario in scenarios:
             #         x = np.linspace(mu - 3*sigma, mu + 3*sigma, 100)
             #         plt.plot(x, norm.pdf(x, mu, sigma), color=color_slams[error_idx%2][i], linestyle=line_styles[i], linewidth=linewidth/2, alpha = 0.6, label=names_of_slams[i] + ' normal pdf')
             plt.legend(fontsize=fontsize)
+            caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Histogram of all trajectories merged for "+data_type_name+" "+error_type.upper()+" error data."
+            label = "fig:"+scenario+"_"+data_type+"_"+error_type+"_histo"
+            caption_label = add_caption_label_to_latex_string("", caption, label)
+            save_latex_table(
+                caption_label, 
+                folder_latex_inputs_fig_caption_labels, 
+                scenario+"_"+data_type+"_"+error_type+"_histo.tex")
 
 
             # save plot as pdf in folder save
