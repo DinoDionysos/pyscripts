@@ -10,14 +10,17 @@ file_prefix=$3 # c8_orb_mono
 folder_orb=$4 # orb
 
 
-# for i in $(seq $1 1 $2)
-# do
-#     python3 bag2csv_2.py $file_prefix"_"$i gt $file_prefix $folder_ssd $folder_orb
-#     python3 bag2csv_2.py $file_prefix"_"$i orb $file_prefix $folder_ssd $folder_orb
-# done
+for i in $(seq $1 1 $2)
+do
+    python3 bag2csv_2.py $file_prefix"_"$i gt $file_prefix $folder_ssd $folder_orb
+    python3 bag2csv_2.py $file_prefix"_"$i orb $file_prefix $folder_ssd $folder_orb
+done
+
+
 
 for i in $(seq $1 1 $2)
 do
+    # here get length of smallest csv file and interpolate the others at the timestamps if it.
     python3 rotate_coor.py \
     orb $i $5 $file_prefix $folder_ssd $folder_orb
 done
