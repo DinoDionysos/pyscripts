@@ -1,5 +1,5 @@
 import time
-
+import sys
 
 def type_yes_to_save(save_flag, scenarios):
     if save_flag:
@@ -17,6 +17,7 @@ def type_yes_to_save(save_flag, scenarios):
             for i in range(5,0,-1):
                 print(i)
                 time.sleep(1)
+                sys.stdout.write("\033[F")
         else:
             save_flag = False
             print("No plots and tables will be saved.")
