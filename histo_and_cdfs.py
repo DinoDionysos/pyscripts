@@ -30,7 +30,7 @@ if save_flag:
     save_flag = type_yes_to_save(save_flag, scenarios)
 else:
     print("No plots and tables will be saved.")
-# complete list of scenarios with results
+
 folder_latex_inputs_fig_caption_labels = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/inputs/input_results/fig_captions_labels/"
 
 c = -1

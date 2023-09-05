@@ -22,16 +22,15 @@ scenario_names = {
 
 save_flag = False
 
-fontsize = 20
+# scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
 scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
 scenarios = ["c"+str(i) for i in scenarios_num]
 if save_flag:
     save_flag = type_yes_to_save(save_flag, scenarios)
 else:
     print("No plots and tables will be saved.")
-# for changing to another simulation scenario the following variables need to be changed:
-# scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
 
+fontsize = 20
 c=-1
 for scenario in scenarios:
     c+=1
