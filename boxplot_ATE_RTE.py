@@ -20,15 +20,17 @@ scenario_names = {
     34: "narrow outdoor curvy"
 }
 
-save_flag = False
+save_flag = True
 
 # scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
 scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
 scenarios = ["c"+str(i) for i in scenarios_num]
 if save_flag:
+    print("########## BOXPLOTS PERCENTILES BOXPLOTS PERCENTILES BOXPLOTS PERCENTILES #############")
     save_flag = type_yes_to_save(save_flag, scenarios)
 else:
-    print("No plots and tables will be saved.")
+    print("No plots and tables will be saved.")   
+    sys.exit(1)  
 
 fontsize = 20
 c=-1
@@ -116,7 +118,7 @@ for scenario in scenarios:
             plt.tight_layout()
             if save_flag:
                 fig.savefig(folder_save+scenario+"_boxplot_"+data_type+"_"+ate_rte+".pdf")
-            caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Boxplots of the "+data_type_print+" \\ac{"+ate_rte+"} for all three ORB-SLAM types. The whisker are the 5 and 95 percentile."
+            caption = "Boxplots of the "+data_type_print+" \\ac{"+ate_rte+"} for all three ORB-SLAM types. The whiskers are the 5 and 95 percentile. The box is the 25 and 75 percentile. The red line is the median."
             label = "fig:"+scenario+"_"+data_type+"_"+ate_rte+"_histo"
             caption_label = add_caption_label_to_latex_string("", caption, label)
             if save_flag:
@@ -129,19 +131,23 @@ for scenario in scenarios:
             percentiles = [5, 25, 50, 75, 95]
             # make mean and std of ate. list of length #slams
             # ATE mean über alle N Trajektorien for alle slam
+            list_slam_ate_mean_min = [np.min(list_slam_repet_ate_rte[i]) for i in range(0, len(list_slam_repet_ate_rte))]
             list_slam_ate_mean_p5 = [np.percentile(list_slam_repet_ate_rte[i],5) for i in range(0, len(list_slam_repet_ate_rte))]
             list_slam_ate_mean_p25 = [np.percentile(list_slam_repet_ate_rte[i],25) for i in range(0, len(list_slam_repet_ate_rte))]
             list_slam_ate_mean_p50 = [np.percentile(list_slam_repet_ate_rte[i],50) for i in range(0, len(list_slam_repet_ate_rte))]
             list_slam_ate_mean_p75 = [np.percentile(list_slam_repet_ate_rte[i],75) for i in range(0, len(list_slam_repet_ate_rte))]
             list_slam_ate_mean_p95 = [np.percentile(list_slam_repet_ate_rte[i],95) for i in range(0, len(list_slam_repet_ate_rte))]
+            list_slam_ate_mean_max = [np.max(list_slam_repet_ate_rte[i]) for i in range(0, len(list_slam_repet_ate_rte))]
 
             # make dataframe from list_slam_ate_mean
             df_ate = pd.DataFrame()
+            df_ate["max"] = list_slam_ate_mean_max
             df_ate["95\%"] = list_slam_ate_mean_p95
             df_ate["75\%"] = list_slam_ate_mean_p75
             df_ate["50\%"] = list_slam_ate_mean_p50
             df_ate["25\%"] = list_slam_ate_mean_p25
             df_ate["5\%"] = list_slam_ate_mean_p5
+            df_ate["min"] = list_slam_ate_mean_min
             # flip the df_ate such that the cols are the rows
             df_ate = df_ate.transpose()
             #change the column names
@@ -153,15 +159,22 @@ for scenario in scenarios:
             for i in range(0, len(short_of_slams)):
                 latex_ate = latex_ate.replace('\n'+str(i)+' & ', '\n'+short_of_slams[i]+' & ')
             # replace "\toprule \\ & mean" with "\toprule \\ ATE (mm) & mean"
-            latex_ate = latex_ate.replace(' & mean', data_type_print_short+' ATE ('+unit+') & mean')
-            caption = "Scenario "+ scenario_names[scenarios_num[c]] +": 5, 25, 50, 75 and 95 percentile of the \\ac{"+ate_rte+"} for "+data_type_print+" error data."
+            # latex_ate = latex_ate.replace(' & mean', data_type_print_short+' ATE ('+unit+') & mean')
+            caption = "5, 25, 50, 75 and 95 percentiles of the \\ac{"+ate_rte+"} for "+data_type_print+" error data. The percentiles are the respective values of the boxplot in (a). The minimum and maximum values are the dots in the boxplot."
             label = "tab:"+scenario+"_"+data_type+"_"+ate_rte+"_percentiles"
-            latex_ate = add_caption_label_to_latex_string(latex_ate, caption, label)
+            latex_ate_caption_label = add_caption_label_to_latex_string("", caption, label)
             # Translational Mean, Standard Deviation and the maximal value of the
             if save_flag:
                 save_latex_table(latex_ate, folder_save, scenario +"_"+ data_type+"_"+ ate_rte +"_percentiles.tex")
+            
+            
+            if save_flag:
+                save_latex_table(
+                    latex_ate_caption_label, 
+                    folder_latex_inputs_fig_caption_labels, 
+                    scenario+"_"+data_type+"_"+ate_rte+"_percentiles.tex")
 
-            caption_main = "Scenario "+ scenario_names[scenarios_num[c]] +": Boxplots and the respective values of the precentiles of the "+data_type_print+" \\ac{"+ate_rte+"} for all three ORB-SLAM types."
+            caption_main = "Scenario "+ scenario_names[scenarios_num[c]] +": Boxplots (a) and the respective values of the precentiles (b) of the "+data_type_print+" \\ac{"+ate_rte+"} for all three ORB-SLAM types."
             label_main = "fig:"+scenario+"_"+data_type+"_"+ate_rte
             caption_label = add_caption_label_to_latex_string("", caption_main, label_main)
             if save_flag:

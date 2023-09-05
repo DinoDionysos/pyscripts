@@ -57,8 +57,8 @@ def df_latex_table_template(test_names, correlation_names=[]):
         num_cols = num_cols_temp + len(test_names)
     else:
         num_cols = num_cols_temp + len(test_names) + len(correlation_names) + len_mean_std_column
-    print('num_rows', num_rows)
-    print('num_cols', num_cols)
+    # print('num_rows', num_rows)
+    # print('num_cols', num_cols)
     df = pd.DataFrame([['' for i in range(0, num_cols)] for j in range(0, num_rows)])
     # df = pd.DataFrame() 
     #test_names = ["KS2", 'BF', "KW", 'BM', "MWU"]
@@ -100,7 +100,7 @@ def df_latex_table_template(test_names, correlation_names=[]):
 
     return df
 
-def latex_table_from_df_template(df, caption, label, precision, test_names, correlation_names=[]):
+def latex_table_from_df_template(df, precision, test_names, correlation_names=[]):
     if len(correlation_names) == 0:
         col_format = 'll|l' + 'r' * len(test_names)
     else:
@@ -114,9 +114,9 @@ def latex_table_from_df_template(df, caption, label, precision, test_names, corr
     string_to_replace = ' %' + ' & ' * (num_cols-1) + ' \\\\'
     # replace '' with string_to_replace
     df_latex = df_latex.replace(string_to_replace, '')
-    # add caption add the end of the string
-    df_latex += "\caption{%s}\n" % caption
-    # add label add the end of the string
-    df_latex += "\label{%s}" % label
+    # # add caption add the end of the string
+    # df_latex += "\caption{%s}\n" % caption
+    # # add label add the end of the string
+    # df_latex += "\label{%s}" % label
     return df_latex
 

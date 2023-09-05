@@ -25,20 +25,26 @@ scenario_names = {
     34: "narrow outdoor curvy"
 }
 
-save_flag = False
+save_flag = True
 
-# scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
-scenarios_num = [15, 28, 19, 17, 51, 49, 34]
+scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
+# scenarios_num = [15, 28, 19, 17, 51, 49, 34]
 scenarios = ["c"+str(i) for i in scenarios_num]
 from util import type_yes_to_save
 if save_flag:
+    print("########## SECOND TEST SECOND TEST SECOND TEST #############")
     save_flag = type_yes_to_save(save_flag, scenarios)
 else:
     print("No plots and tables will be saved.")
+    sys.exit(1)
 
 c=-1
 for scenario in scenarios:
     c+=1
+    folder_latex_inputs_fig_caption_labels = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/inputs/input_results/fig_captions_labels/" + scenario + "/"
+    if not os.path.exists(folder_latex_inputs_fig_caption_labels):
+        os.makedirs(folder_latex_inputs_fig_caption_labels)
+    
     print('scenario', scenario)
     folder_results_win = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/results/"
     folder_results_ssd = "/mnt/d/results/"
@@ -75,7 +81,7 @@ for scenario in scenarios:
             df = df_latex_table_template(test_names, correlation_names)
             df = insert_multicol_at(df, 'Scenario '+scenario_names[scenarios_num[c]]+':', 0)
             df = insert_multicol_at(df,names_of_slams[slam_idx_1]+' and '+ names_of_slams[slam_idx_2], 1)
-            df = insert_multicol_at(df, 'Significance level $\\alpha$ = '+str(alpha*100)+'\%', 2)
+            df = insert_multicol_at(df, 'Significance level $\\alpha$ = '+str(alpha)+", 20 repetitions", 2)
             # print('hello from slam', slam_idx_1, slam_idx_2)
             ############################### loop rotat trans ####################
             data_idx = -1
@@ -126,7 +132,7 @@ for scenario in scenarios:
                         col_idx=offset_col+len(test_names)+1+correlation_idx
                         df.iloc[row_index, col_idx] = mean
                         df.iloc[row_index+1, col_idx] = std
-            caption = "Scenario %s: Evaluation of %s and %s. The table shows the counts of rejection and fails of rejection of the hypothesis tests \\ac{ks2}, \\ac{bf}, \\ac{kw}, \\ac{bm}, \\ac{mwu}. The tests were applied on the translational \\ac{ape} and \\ac{rpe} as well as the rotational. The two columns on the right show the mean and standard deviation of the effect strength coefficients $f$." % (
+            caption = "Scenario %s: Evaluation of %s and %s. The table shows the counts of rejections and fails of rejection of 20 repetitions of the hypothesis tests \\ac{ks2} and Kendall's Tau with significance level 0.05. The tests were applied on the translational \\ac{ape} and \\ac{rpe} as well as the rotational." % (
                             scenario_names[scenarios_num[c]],
                             short_of_slams[slam_idx_1], 
                             short_of_slams[slam_idx_2])
@@ -134,8 +140,14 @@ for scenario in scenarios:
                 scenario,
                 short_of_slams[slam_idx_1], 
                 short_of_slams[slam_idx_2])
+            # save the label and caption in a file in folder_latex_inputs_fig_caption_labels
+            if save_flag:
+                save_latex_table(
+                    add_caption_label_to_latex_string("", caption, label), 
+                    folder_latex_inputs_fig_caption_labels, 
+                    scenario+"_"+short_of_slams[slam_idx_1]+"_"+short_of_slams[slam_idx_2]+"_compact.tex")
             # def to latex with function from util_latex_tables_2.py
-            latex_string_table = latex_table_from_df_template(df, caption, label, precision, test_names, correlation_names)
+            latex_string_table = latex_table_from_df_template(df, precision, test_names, correlation_names)
             save_name = "compact_"+\
                 short_of_slams[slam_idx_1] +"_"+ \
                 short_of_slams[slam_idx_2] + ".tex"

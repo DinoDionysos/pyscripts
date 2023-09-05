@@ -21,17 +21,17 @@ scenario_names = {
     34: "narrow outdoor curvy"
 }
 
-save_flag = False
+save_flag = True
 
-# scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
-scenarios_num = [15, 28, 19, 17, 51, 49, 34]
+scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
+# scenarios_num = [15]
 scenarios = ["c"+str(i) for i in scenarios_num]
 if save_flag:
+    print("########## HISTOGRAMM CDF HISTOGRAMM CDF HISTOGRAMM CDF #############")
     save_flag = type_yes_to_save(save_flag, scenarios)
 else:
     print("No plots and tables will be saved.")
-
-folder_latex_inputs_fig_caption_labels = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/inputs/input_results/fig_captions_labels/"
+    sys.exit(1)
 
 c = -1
 for scenario in scenarios:
@@ -83,8 +83,10 @@ for scenario in scenarios:
     histtype = ['stepfilled', 'stepfilled', 'step']
     linewidth = [1, 1, 2]
     linewidth_cdf_pairs = 2
-    cut_y_upper = [0.99, 0.99,0.95,0.98] # order: xy_ape, xy_rpe, yaw_ape, yaw_rpe
-    cut_y_lower = [-1, 0.01,0.05,0.02]
+    # cut_y_upper = [0.995, 0.99,0.95,0.98] # order: xy_ape, xy_rpe, yaw_ape, yaw_rpe
+    # cut_y_lower = [-1, 0.01,0.05,0.02]
+    cut_y_upper = [2, 0.99, 0.99, 0.99] # order: xy_ape, xy_rpe, yaw_ape, yaw_rpe
+    cut_y_lower = [-1, 0.01, 0.015, 0.01]
 
 
 
@@ -139,7 +141,7 @@ for scenario in scenarios:
                     else:
                         plt.plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], alpha=alpha, linewidth=linewidth_cdf)
 
-                    caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Empirical CDFs of every trajectory and of all trajectories merged for "+data_type_name+" "+error_type.upper()+" error data."
+                    caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Empirical CDFs of every trajectory and of all trajectories merged for "+data_type_name+" "+error_type.upper()+" data. The error is shown on the x-axis and the cumulative probability on the y-axis. The CDFs of all trajectories merged are shown in bold."
                     label = "fig:"+scenario+"_"+data_type+"_"+error_type+"_cdf"
                     caption_label = add_caption_label_to_latex_string("", caption, label)
                     if save_flag:
@@ -300,7 +302,7 @@ for scenario in scenarios:
             #         x = np.linspace(mu - 3*sigma, mu + 3*sigma, 100)
             #         plt.plot(x, norm.pdf(x, mu, sigma), color=color_slams[error_idx%2][i], linestyle=line_styles[i], linewidth=linewidth/2, alpha = 0.6, label=names_of_slams[i] + ' normal pdf')
             plt.legend(fontsize=fontsize)
-            caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Histogram of all trajectories merged for "+data_type_name+" "+error_type.upper()+" error data."
+            caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Histogram of all trajectories merged for "+data_type_name+" "+error_type.upper()+" data. The error is shown on the x-axis and the probability on the y-axis."
             label = "fig:"+scenario+"_"+data_type+"_"+error_type+"_histo"
             caption_label = add_caption_label_to_latex_string("", caption, label)
             if save_flag:
