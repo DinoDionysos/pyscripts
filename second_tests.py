@@ -25,10 +25,17 @@ scenario_names = {
     34: "narrow outdoor curvy"
 }
 
-# for changing to another simulation scenario the following variables need to be changed:
+save_flag = False
+
 # scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
 scenarios_num = [15, 28, 19, 17, 51, 49, 34]
 scenarios = ["c"+str(i) for i in scenarios_num]
+from util import type_yes_to_save
+if save_flag:
+    save_flag = type_yes_to_save(save_flag, scenarios)
+else:
+    print("No plots and tables will be saved.")
+
 c=-1
 for scenario in scenarios:
     c+=1
@@ -132,10 +139,11 @@ for scenario in scenarios:
             save_name = "compact_"+\
                 short_of_slams[slam_idx_1] +"_"+ \
                 short_of_slams[slam_idx_2] + ".tex"
-            save_latex_table(
-                latex_string_table, 
-                folder_save, 
-                save_name)
+            if save_flag:
+                save_latex_table(
+                    latex_string_table, 
+                    folder_save, 
+                    save_name)
                     
                     
                 

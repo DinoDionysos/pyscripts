@@ -6,6 +6,7 @@ import sys
 from util_hypothesis_tests_2 import read_cols_from_folder
 from util_error_measures import *
 from util_latex_tables import *
+from util import type_yes_to_save
 
 #make dictionary with names of the scenarios
 scenario_names = {
@@ -18,11 +19,19 @@ scenario_names = {
     49: "wide outdoor curvy",
     34: "narrow outdoor curvy"
 }
+
+save_flag = False
+
 fontsize = 20
+scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
+scenarios = ["c"+str(i) for i in scenarios_num]
+if save_flag:
+    save_flag = type_yes_to_save(save_flag, scenarios)
+else:
+    print("No plots and tables will be saved.")
 # for changing to another simulation scenario the following variables need to be changed:
 # scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
-scenarios_num = [15, 28, 19, 17, 51, 49, 34]
-scenarios = ["c"+str(i) for i in scenarios_num]
+
 c=-1
 for scenario in scenarios:
     c+=1
@@ -95,18 +104,27 @@ for scenario in scenarios:
                 #plot boxplot of ate for slam i in figure
                 # plt.boxplot(list_slam_repet_ate_rte[i], positions=[i])
                 #increase linewidth
-                plt.boxplot(list_slam_repet_ate_rte[i], positions=[i], widths=0.5, boxprops=dict(linewidth=2), medianprops=dict(linewidth=2), whiskerprops=dict(linewidth=2), capprops=dict(linewidth=2))
+                plt.boxplot(list_slam_repet_ate_rte[i],
+                             whis=(5,95), 
+                             positions=[i], 
+                             widths=0.5, 
+                             boxprops=dict(linewidth=2), 
+                             medianprops=dict(linewidth=2), 
+                             whiskerprops=dict(linewidth=2), 
+                             capprops=dict(linewidth=2))
             plt.xticks(np.arange(0, len(list_slam_repet_ate_rte)), short_of_slams)
             plt.tick_params(axis='both', which='major', labelsize=fontsize)
             plt.tight_layout()
-            fig.savefig(folder_save+scenario+"_boxplot_"+data_type+"_"+ate_rte+".pdf")
-            caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Boxplots of the "+data_type_print+" \\ac{"+ate_rte+"} for all three ORB-SLAM types."
+            if save_flag:
+                fig.savefig(folder_save+scenario+"_boxplot_"+data_type+"_"+ate_rte+".pdf")
+            caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Boxplots of the "+data_type_print+" \\ac{"+ate_rte+"} for all three ORB-SLAM types. The whisker are the 5 and 95 percentile."
             label = "fig:"+scenario+"_"+data_type+"_"+ate_rte+"_histo"
             caption_label = add_caption_label_to_latex_string("", caption, label)
-            save_latex_table(
-                caption_label, 
-                folder_latex_inputs_fig_caption_labels, 
-                scenario+"_boxplot_"+data_type+"_"+ate_rte+".tex")
+            if save_flag:
+                save_latex_table(
+                    caption_label, 
+                    folder_latex_inputs_fig_caption_labels, 
+                    scenario+"_boxplot_"+data_type+"_"+ate_rte+".tex")
             # plt.show(block=False)
 
             percentiles = [5, 25, 50, 75, 95]
@@ -138,18 +156,20 @@ for scenario in scenarios:
             # replace "\toprule \\ & mean" with "\toprule \\ ATE (mm) & mean"
             latex_ate = latex_ate.replace(' & mean', data_type_print_short+' ATE ('+unit+') & mean')
             caption = "Scenario "+ scenario_names[scenarios_num[c]] +": 5, 25, 50, 75 and 95 percentile of the \\ac{"+ate_rte+"} for "+data_type_print+" error data."
-            label = "tab:"+scenario+"_"+data_type+"_"+ate_rte+"_mean_std_max"
+            label = "tab:"+scenario+"_"+data_type+"_"+ate_rte+"_percentiles"
             latex_ate = add_caption_label_to_latex_string(latex_ate, caption, label)
             # Translational Mean, Standard Deviation and the maximal value of the
-            save_latex_table(latex_ate, folder_save, scenario +"_"+ data_type+"_"+ ate_rte +"_mean_std_max.tex")
+            if save_flag:
+                save_latex_table(latex_ate, folder_save, scenario +"_"+ data_type+"_"+ ate_rte +"_percentiles.tex")
 
             caption_main = "Scenario "+ scenario_names[scenarios_num[c]] +": Boxplots and the respective values of the precentiles of the "+data_type_print+" \\ac{"+ate_rte+"} for all three ORB-SLAM types."
             label_main = "fig:"+scenario+"_"+data_type+"_"+ate_rte
             caption_label = add_caption_label_to_latex_string("", caption_main, label_main)
-            save_latex_table(
-                caption_label, 
-                folder_latex_inputs_fig_caption_labels, 
-                scenario+"_"+data_type+"_"+ate_rte+".tex")
+            if save_flag:
+                save_latex_table(
+                    caption_label, 
+                    folder_latex_inputs_fig_caption_labels, 
+                    scenario+"_"+data_type+"_"+ate_rte+".tex")
             
             
 

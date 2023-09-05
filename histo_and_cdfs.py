@@ -8,6 +8,7 @@ from util_hypothesis_tests_2 import read_cols_from_folder
 from util_latex_tables import *
 from util_error_measures import *
 from scipy.stats import norm
+from util import type_yes_to_save
 
 scenario_names = {
     9: "wide outdoor loop",
@@ -20,14 +21,19 @@ scenario_names = {
     34: "narrow outdoor curvy"
 }
 
-# complete list of scenarios with results
+save_flag = False
+
 # scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
 scenarios_num = [15, 28, 19, 17, 51, 49, 34]
-folder_latex_inputs_fig_caption_labels = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/inputs/input_results/fig_captions_labels/"
-# for changing to another simulation scenario the following variables need to be changed:
-# scenarios_num = [47,50,49,51,48,46,45]
-c = -1
 scenarios = ["c"+str(i) for i in scenarios_num]
+if save_flag:
+    save_flag = type_yes_to_save(save_flag, scenarios)
+else:
+    print("No plots and tables will be saved.")
+# complete list of scenarios with results
+folder_latex_inputs_fig_caption_labels = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/inputs/input_results/fig_captions_labels/"
+
+c = -1
 for scenario in scenarios:
     c+=1
     folder_latex_inputs_fig_caption_labels = "/mnt/c/Users/Daniel/Studium_AI_Engineering/0_Masterarbeit/Latex/inputs/input_results/fig_captions_labels/" + scenario + "/"
@@ -136,10 +142,11 @@ for scenario in scenarios:
                     caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Empirical CDFs of every trajectory and of all trajectories merged for "+data_type_name+" "+error_type.upper()+" error data."
                     label = "fig:"+scenario+"_"+data_type+"_"+error_type+"_cdf"
                     caption_label = add_caption_label_to_latex_string("", caption, label)
-                    save_latex_table(
-                        caption_label, 
-                        folder_latex_inputs_fig_caption_labels, 
-                        scenario+"_"+data_type+"_"+error_type+"_cdfs.tex")
+                    if save_flag:
+                        save_latex_table(
+                            caption_label, 
+                            folder_latex_inputs_fig_caption_labels, 
+                            scenario+"_"+data_type+"_"+error_type+"_cdfs.tex")
                     #############cdf pairs##############
                     axs_2[j//sub_x, j%sub_x].plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], alpha=1.0, linewidth=linewidth_cdf_pairs, label=names_of_slams[i])
                     # title of the plots is the number
@@ -296,21 +303,24 @@ for scenario in scenarios:
             caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Histogram of all trajectories merged for "+data_type_name+" "+error_type.upper()+" error data."
             label = "fig:"+scenario+"_"+data_type+"_"+error_type+"_histo"
             caption_label = add_caption_label_to_latex_string("", caption, label)
-            save_latex_table(
-                caption_label, 
-                folder_latex_inputs_fig_caption_labels, 
-                scenario+"_"+data_type+"_"+error_type+"_histo.tex")
+            if save_flag:
+                save_latex_table(
+                    caption_label, 
+                    folder_latex_inputs_fig_caption_labels, 
+                    scenario+"_"+data_type+"_"+error_type+"_histo.tex")
 
 
             # save plot as pdf in folder save
             plt.figure(fig.number)
             plt.tight_layout()
-            plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_histo.pdf'), bbox_inches='tight')
+            if save_flag:
+                plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_histo.pdf'), bbox_inches='tight')
 
             # save fig_4 as pdf in folder save
             plt.figure(fig_4.number)
             plt.tight_layout()
-            plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_cdfs.pdf'), bbox_inches='tight')
+            if save_flag:
+                plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_cdfs.pdf'), bbox_inches='tight')
 
 
             # save fig_2
@@ -318,13 +328,15 @@ for scenario in scenarios:
             #set the title of the figure
             # fig_2.suptitle("Scenario "+scenario+" "+data_type_name+" "+error_type.upper()+": Empirical CDFs of every trajectory pair", fontsize=fontsize)
             plt.tight_layout()
-            plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_all_cdf_pairs.pdf'), bbox_inches='tight')
+            if save_flag:
+                plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_all_cdf_pairs.pdf'), bbox_inches='tight')
             # save fig_3
             plt.figure(fig_3.number)
             #set the title of the figure
             # fig_3.suptitle("Scenario "+scenario+" "+data_type_name+" "+error_type.upper()+": Histogram of the errors of every trajectory pair", fontsize=fontsize)
             plt.tight_layout()
-            plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_all_histo_pairs.pdf'), bbox_inches='tight')
+            if save_flag:
+                plt.savefig(os.path.join(folder_save, scenario +'_'+data_type +'_'+error_type + '_all_histo_pairs.pdf'), bbox_inches='tight')
 
             # plt.show()
             # matplotlib.pyplot.close()
