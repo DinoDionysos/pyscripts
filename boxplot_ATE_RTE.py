@@ -69,8 +69,8 @@ for scenario in scenarios:
             data_type_print = "translational"
             data_type_print_short = "trans."
             unit = "mm"
-            precision_rte = 2
-            precision_ate = 2
+            precision_rte = 1
+            precision_ate = 1
         else:
             list_slam_repet_trajec_ape = [read_cols_from_folder(folder, "yaw_ape") for folder in folders] 
             list_slam_repet_trajec_rpe = [read_cols_from_folder(folder, "yaw_rpe") for folder in folders]
@@ -119,7 +119,7 @@ for scenario in scenarios:
             if save_flag:
                 fig.savefig(folder_save+scenario+"_boxplot_"+data_type+"_"+ate_rte+".pdf")
             caption = "Boxplots of the "+data_type_print+" \\ac{"+ate_rte+"} for all three ORB-SLAM types. The whiskers are the 5 and 95 percentile. The box is the 25 and 75 percentile. The red line is the median."
-            label = "fig:"+scenario+"_"+data_type+"_"+ate_rte+"_histo"
+            label = "fig:"+scenario+"_"+data_type+"_"+ate_rte+"_boxplot"
             caption_label = add_caption_label_to_latex_string("", caption, label)
             if save_flag:
                 save_latex_table(
