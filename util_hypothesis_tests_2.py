@@ -16,7 +16,7 @@ import pandas as pd
 
 def kendallstau(data_1 : np.array, data_2 : np.array):
     """kendall's tau. returns stat, p"""
-    return kendalltau(data_1, data_2)
+    return kendalltau(data_1, data_2, alternative='less')
 
 def spearmanr(data_1 : np.array, data_2 : np.array):
     """spearman's r. returns stat, p"""
