@@ -155,9 +155,13 @@ for scenario in scenarios:
             # name the index column "percentile"
             # df_ate.index.name = "p"
             # to latex
+            # #name the index column (deg)
+            # df_ate.index.name = "("+unit+")"
             latex_ate = df_ate.to_latex(float_format=f'%.{precision_ate}f')
             for i in range(0, len(short_of_slams)):
                 latex_ate = latex_ate.replace('\n'+str(i)+' & ', '\n'+short_of_slams[i]+' & ')
+            # replace " & stereo & RGBD & mono" with "("+unit+") & stereo & RGBD & mono"
+            latex_ate = latex_ate.replace(' & stereo & RGBD & mono', '('+unit+') & stereo & RGBD & mono')
             # replace "\toprule \\ & mean" with "\toprule \\ ATE (mm) & mean"
             # latex_ate = latex_ate.replace(' & mean', data_type_print_short+' ATE ('+unit+') & mean')
             caption = "5, 25, 50, 75 and 95 percentiles of the \\ac{"+ate_rte+"} for "+data_type_print+" error data. The percentiles are the respective values of the boxplot in (a). The minimum and maximum values are the dots in the boxplot."
