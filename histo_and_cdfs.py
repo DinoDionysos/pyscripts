@@ -24,7 +24,7 @@ scenario_names = {
 save_flag = True
 
 scenarios_num = [9, 15, 28, 19, 17, 51, 49, 34]
-# scenarios_num = [15]
+# scenarios_num = [51]
 scenarios = ["c"+str(i) for i in scenarios_num]
 if save_flag:
     print("########## HISTOGRAMM CDF HISTOGRAMM CDF HISTOGRAMM CDF #############")
@@ -104,7 +104,7 @@ for scenario in scenarios:
             data_type_name = "rotational"
             data_unit = "deg"
             data_type_idx = 1
-        for error_type in ["ape", "rpe"]:
+        for error_type in ["ape"]:#, "rpe"]:
             error_idx+=1
             print(data_type +' '+error_type)
             fig = plt.figure(figsize=(12, 3.5))
@@ -141,7 +141,7 @@ for scenario in scenarios:
                     else:
                         plt.plot(x, y, color=color_slams[error_idx%2][i], linestyle=line_styles[i], alpha=alpha, linewidth=linewidth_cdf)
 
-                    caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Empirical CDFs of every trajectory and of all trajectories merged for "+data_type_name+" "+error_type.upper()+" data. The error is shown on the x-axis and the cumulative probability on the y-axis. The CDFs of all trajectories merged are shown in bold."
+                    caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Empirical CDFs of every trajectory and of all trajectories merged for "+data_type_name+" "+error_type.upper()+" data. The error is shown on the \\textit{x}-axis and the cumulative probability on the \\textit{y}-axis. The CDFs of all trajectories merged are shown in bold."
                     label = "fig:"+scenario+"_"+data_type+"_"+error_type+"_cdf"
                     caption_label = add_caption_label_to_latex_string("", caption, label)
                     if save_flag:
@@ -256,6 +256,14 @@ for scenario in scenarios:
             plt.tick_params(axis='both', which='minor', labelsize=fontsize)
             #get axis limits of plot above
             xmin, xmax = plt.xlim()
+            if error_type == "ape" and scenario == "c17" and data_type == "yaw":
+                xmin = -0.05
+                xmax = 0.5
+                plt.xlim(xmin, xmax)
+            if error_type == "ape" and scenario == "c51" and data_type == "yaw":
+                xmin = -0.05
+                xmax = 5.0
+                plt.xlim(xmin, xmax)
 
             ########################################################### histogram
             plt.figure(fig.number)
@@ -292,6 +300,7 @@ for scenario in scenarios:
             plt.tick_params(axis='both', which='minor', labelsize=fontsize)
             #get the max value of the histogram  
             #set axis limits of plot below
+
             plt.xlim(xmin, xmax)
             # if rpe get mean and std of the x_list elements
             # if error_type == "rpe":
@@ -302,7 +311,7 @@ for scenario in scenarios:
             #         x = np.linspace(mu - 3*sigma, mu + 3*sigma, 100)
             #         plt.plot(x, norm.pdf(x, mu, sigma), color=color_slams[error_idx%2][i], linestyle=line_styles[i], linewidth=linewidth/2, alpha = 0.6, label=names_of_slams[i] + ' normal pdf')
             plt.legend(fontsize=fontsize)
-            caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Histogram of all trajectories merged for "+data_type_name+" "+error_type.upper()+" data. The error is shown on the x-axis and the probability on the y-axis."
+            caption = "Scenario "+ scenario_names[scenarios_num[c]] +": Histogram of all trajectories merged for "+data_type_name+" "+error_type.upper()+" data. The error is shown on the \\textit{x}-axis and the probability on the \\textit{y}-axis."
             label = "fig:"+scenario+"_"+data_type+"_"+error_type+"_histo"
             caption_label = add_caption_label_to_latex_string("", caption, label)
             if save_flag:
